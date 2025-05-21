@@ -1,0 +1,25 @@
+{
+    // Python
+    "python.defaultInterpreterPath": "venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    // Auto-format on save
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    // Enable Pylance strict type-checking
+    "python.analysis.typeCheckingMode": "basic",
+    // Electron front-end
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript"
+    ],
+    // Terminal shells
+    "terminal.integrated.shell.osx": "/bin/zsh",
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/backend"
+    }
+}

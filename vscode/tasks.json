@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Backend Deps",
+            "type": "shell",
+            "command": "pip install -r backend/requirements.txt",
+            "group": "build"
+        },
+        {
+            "label": "Install Frontend Deps",
+            "type": "shell",
+            "command": "cd frontend && npm install",
+            "group": "build"
+        },
+        {
+            "label": "Run Gesture Server",
+            "type": "shell",
+            "command": "python backend/server.py",
+            "group": "test"
+        },
+        {
+            "label": "Start Electron",
+            "type": "shell",
+            "command": "cd frontend && npm start",
+            "group": "test"
+        }
+    ]
+}
