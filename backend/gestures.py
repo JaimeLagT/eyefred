@@ -22,8 +22,10 @@ class Finger(Enum):
 persistenceCounters = {
     "open_palm": 0,
     "fist": 0,
+    "peace": 0,
     "swipe_left":0,
     "swipe_right":0,
+    "rock":0,
 }
 
 PERSISTENCE = 20
@@ -36,7 +38,8 @@ def detectGesture(landmarks: Any) -> Optional[str]:
     #add the current frame to the buffer
     frameHistoryBuffer.append(landmarks.landmark[WRIST].x)
     #remember to keep dynamic ones first in the list
-    gestures = [("swipe_left",isSwipeLeft),("swipe_right",isSwipeRight), ("open_palm",isOpenPalm), ("fist",isFist)]
+    #todo: move mappings and lists to sepperate file
+    gestures = [("swipe_left",isSwipeLeft),("swipe_right",isSwipeRight), ("open_palm",isOpenPalm), ("fist",isFist), ("peace", isPeace), ("rock",isRock)]
     #iterate over gestures returning the detected one
     for label, func in gestures:
         ##add pers checker here
@@ -80,7 +83,7 @@ def isSwipeRight(landmarks: Any) -> bool:
 def isOpenPalm(landmarks: Any) -> bool:
     #checks if all fingers are extended aka an open palm
     return all([
-    isFingerExtended(landmarks, Finger.Thumb),
+    isThumbExtended(landmarks, Finger.Thumb),
     isFingerExtended(landmarks, Finger.Index),
     isFingerExtended(landmarks, Finger.Middle),
     isFingerExtended(landmarks, Finger.Ring),
@@ -90,11 +93,29 @@ def isOpenPalm(landmarks: Any) -> bool:
 def isFist(landmarks: Any) -> bool:
     #checks if all finders are folded aka fist
     return all([
-    #isFingerFolded(landmarks, Finger.Thumb),
+    isThumbFolded(landmarks, Finger.Thumb),
     isFingerFolded(landmarks, Finger.Index),
     isFingerFolded(landmarks, Finger.Middle),
     isFingerFolded(landmarks, Finger.Ring),
     isFingerFolded(landmarks, Finger.Pinky),
+    ])
+
+def isPeace(landmarks: Any)-> bool:
+    return all([
+        isFingerExtended(landmarks, Finger.Index),
+        isFingerExtended(landmarks, Finger.Middle),
+        isFingerFolded(landmarks, Finger.Ring),
+        isFingerFolded(landmarks, Finger.Pinky),
+        isThumbFolded(landmarks, Finger.Thumb),
+    ])
+
+def isRock(landmarks: Any)-> bool:
+    return all([
+        isFingerExtended(landmarks, Finger.Index),
+        isFingerFolded(landmarks, Finger.Middle),
+        isFingerFolded(landmarks, Finger.Ring),
+        isFingerExtended(landmarks, Finger.Pinky),
+        isThumbExtended(landmarks, Finger.Thumb),
     ])
 
 
@@ -110,6 +131,15 @@ def isFingerExtended(landmarks, finger: Finger) -> bool:
     pip = landmarks.landmark[finger.pipIndex]
     return tip.y < pip.y
 
+def isThumbFolded(landmarks, finger: Finger) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    pip = landmarks.landmark[finger.pipIndex]
+    return tip.x < pip.x
+
+def isThumbExtended(landmarks, finger: Finger) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    pip = landmarks.landmark[finger.pipIndex]
+    return tip.x > pip.x
 
 def checkPersistence(label) -> bool:
     if(persistenceCounters[label] == PERSISTENCE):
