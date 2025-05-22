@@ -43,7 +43,7 @@ def detectGesture(landmarks: Any) -> Optional[str]:
         if func(landmarks):
             if  lastFiredGesture == label:
                 return None
-            else:
+            else: ##if its not the same just reset it to none 
                 lastFiredGesture = None
             if checkPersistence(label):
                 lastFiredGesture = label
