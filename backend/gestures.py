@@ -1,85 +1,10 @@
 import mediapipe as mp
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 from collections import deque
+import math
 
-#declare frame history buffer
-frameHistoryBuffer = deque(maxlen=10) ##10fps for now
-
-lastFiredGesture = None
-#declare all fingers as enums
-class Finger(Enum):
-    Thumb  = (4, 2)
-    Index  = (8, 6)
-    Middle = (12, 10)
-    Ring   = (16, 14)
-    Pinky  = (20, 18)
-
-    def __init__(self, tipIndex: int, pipIndex: int):
-        self.tipIndex = tipIndex
-        self.pipIndex = pipIndex
-
-persistenceCounters = {
-    "open_palm": 0,
-    "fist": 0,
-    "peace": 0,
-    "swipe_left":0,
-    "swipe_right":0,
-    "rock":0,
-}
-
-PERSISTENCE = 20
-WRIST = 0
-SWIPETHRESHOLD = 0.3
-
-
-def detectGesture(landmarks: Any) -> Optional[str]:
-    global lastFiredGesture
-    #add the current frame to the buffer
-    frameHistoryBuffer.append(landmarks.landmark[WRIST].x)
-    #remember to keep dynamic ones first in the list
-    #todo: move mappings and lists to sepperate file
-    gestures = [("swipe_left",isSwipeLeft),("swipe_right",isSwipeRight), ("open_palm",isOpenPalm), ("fist",isFist), ("peace", isPeace), ("rock",isRock)]
-    #iterate over gestures returning the detected one
-    for label, func in gestures:
-        ##add pers checker here
-        if func(landmarks):
-            if  lastFiredGesture == label:
-                return None
-            else: ##if its not the same just reset it to none 
-                lastFiredGesture = None
-            if checkPersistence(label):
-                lastFiredGesture = label
-                return label
-            else:
-                return None
-    #if no gesture is detected, return None and update counters
-    resetCounters()
-    return None
-
-def isSwipeLeft(landmarks: Any) -> bool:
-
-     #check if buffer if full
-    if(len(frameHistoryBuffer) == 10):
-        ##check if the wrist is moving left
-        diff = frameHistoryBuffer[-1] - frameHistoryBuffer[0]
-        if(diff <= -SWIPETHRESHOLD):
-            frameHistoryBuffer.clear()
-            frameHistoryBuffer.append(landmarks.landmark[WRIST].x)
-            return True
-    return False
-
-def isSwipeRight(landmarks: Any) -> bool:
-    #check if buffer if full
-    if(len(frameHistoryBuffer) == 10):
-        ##check if the wrist is moving right
-        diff = frameHistoryBuffer[-1] - frameHistoryBuffer[0]
-        if(diff >= SWIPETHRESHOLD):
-            frameHistoryBuffer.clear()
-            frameHistoryBuffer.append(landmarks.landmark[WRIST].x)
-            return True
-    return False
-
+#========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
     #checks if all fingers are extended aka an open palm
     return all([
@@ -90,15 +15,15 @@ def isOpenPalm(landmarks: Any) -> bool:
     isFingerExtended(landmarks, Finger.Pinky),
     ])
 
-def isFist(landmarks: Any) -> bool:
-    #checks if all finders are folded aka fist
-    return all([
-    isThumbFolded(landmarks, Finger.Thumb),
-    isFingerFolded(landmarks, Finger.Index),
-    isFingerFolded(landmarks, Finger.Middle),
-    isFingerFolded(landmarks, Finger.Ring),
-    isFingerFolded(landmarks, Finger.Pinky),
-    ])
+# def isFist(landmarks: Any) -> bool:
+#     #checks if all finders are folded aka fist
+#     return all([
+#     isThumbFolded(landmarks, Finger.Thumb),
+#     isFingerFolded(landmarks, Finger.Index),
+#     isFingerExtended(landmarks, Finger.Middle),
+#     isFingerFolded(landmarks, Finger.Ring),
+#     isFingerFolded(landmarks, Finger.Pinky),
+#     ])
 
 def isPeace(landmarks: Any)-> bool:
     return all([
@@ -118,7 +43,65 @@ def isRock(landmarks: Any)-> bool:
         isThumbExtended(landmarks, Finger.Thumb),
     ])
 
+def isThumbsLeft(landmarks: Any) -> bool:
+    # all other fingers folded, thumb extended and pointing up
+    return all([
+        isFingerFolded(landmarks, Finger.Index),
+        isFingerFolded(landmarks, Finger.Middle),
+        isFingerFolded(landmarks, Finger.Ring),
+        isFingerFolded(landmarks, Finger.Pinky),
+        isThumbExtended(landmarks, Finger.Thumb),
+        isThumbLeft(landmarks, Finger.Thumb),
+    ])
 
+def isThumbsRight(landmarks: Any) -> bool:
+    # all other fingers folded, thumb extended and pointing down
+    return all([
+        isFingerFolded(landmarks, Finger.Index),
+        isFingerFolded(landmarks, Finger.Middle),
+        isFingerFolded(landmarks, Finger.Ring),
+        isFingerFolded(landmarks, Finger.Pinky),
+        #isThumbExtended(landmarks, Finger.Thumb),
+        isThumbFolded(landmarks, Finger.Thumb),
+    ])
+
+#========================== GLOBAL VARIABLES ==========================#
+
+lastFiredGesture = None
+#declare all fingers as enums
+class Finger(Enum):
+    Thumb  = (4, 2)
+    Index  = (8, 6)
+    Middle = (12, 10)
+    Ring   = (16, 14)
+    Pinky  = (20, 18)
+
+    def __init__(self, tipIndex: int, pipIndex: int):
+        self.tipIndex = tipIndex
+        self.pipIndex = pipIndex
+
+persistenceCounters = {
+    "open_palm": 0,
+    #"fist": 0,
+    "peace": 0,
+    "rock":0,
+    "thumbs_right":0,
+    "thumbs_left":0,
+}
+
+STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
+    ("open_palm", isOpenPalm, True),
+    #("fist",      isFist, True),
+    ("peace",     isPeace, True),
+    ("rock",      isRock, True),
+    ("thumbs_right", isThumbsRight, False),
+    ("thumbs_left", isThumbsLeft, False),
+]
+
+PERSISTENCE = 20
+THUMBSIDE = 0.05
+
+#========================== HELPER FUNCTIONS ==========================#
 #add epsilon threshold in the future for edge cases
 
 def isFingerFolded(landmarks, finger: Finger) -> bool:
@@ -141,6 +124,17 @@ def isThumbExtended(landmarks, finger: Finger) -> bool:
     pip = landmarks.landmark[finger.pipIndex]
     return tip.x > pip.x
 
+def isThumbLeft(landmarks, finger: Finger) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    mcp = landmarks.landmark[finger.pipIndex]
+    return tip.x > mcp.x + THUMBSIDE
+
+def isThumbRight(landmarks, finger: Finger) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    mcp = landmarks.landmark[finger.pipIndex]
+    return tip.x > mcp.x
+
+
 def checkPersistence(label) -> bool:
     if(persistenceCounters[label] == PERSISTENCE):
         persistenceCounters[label] = 0
@@ -153,3 +147,27 @@ def resetCounters():
     for gestureName in persistenceCounters:
         persistenceCounters[gestureName] = 0
     lastFiredGesture = None
+
+#========================== MAIN FUNCTION ==========================#
+
+def detectGesture(landmarks: Any) -> Optional[str]:
+    global lastFiredGesture
+    for label, test_fn, bounce in STATIC_GESTURES:
+        if not test_fn(landmarks):
+            continue
+         
+        if not checkPersistence(label):
+            return None
+        
+        if not bounce:
+            return label
+        
+        if lastFiredGesture == label:
+            return None
+        
+        lastFiredGesture = label
+        return label
+
+    # no match this frame → reset all counters
+    resetCounters()
+    return None

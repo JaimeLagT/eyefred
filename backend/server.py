@@ -13,7 +13,7 @@ from gestures import *
 ##we want to run at 30-fps
 
 async def gesture_server(websocket, path):
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: Could not open webcam.")
         return
