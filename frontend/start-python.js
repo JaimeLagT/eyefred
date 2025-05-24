@@ -12,7 +12,7 @@ const pythonProcess = spawn(pythonCmd, [backendPath], {
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: true
 });
-//whenever python script prints something pring it to the terminal
+//whenever python script prints something print it to the terminal
 pythonProcess.stdout.on('data', (data) => {
     console.log(`[Python stdout]: ${data.toString()}`);
 });
@@ -28,7 +28,3 @@ pythonProcess.on('error', (err) => {
 pythonProcess.on('exit', (code) => {
     console.log(`Python server exited with code ${code}`);
 });
-
-
-
-
