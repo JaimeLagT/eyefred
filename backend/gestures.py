@@ -2,7 +2,6 @@ import mediapipe as mp
 from enum import Enum
 from typing import Optional, Any, Callable
 from collections import deque
-import math
 
 #========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
@@ -68,7 +67,8 @@ def isThumbsRight(landmarks: Any) -> bool:
 #========================== GLOBAL VARIABLES ==========================#
 
 lastFiredGesture = None
-#declare all fingers as enums
+
+#mediapipe landmark numbers to fingers
 class Finger(Enum):
     Thumb  = (4, 2)
     Index  = (8, 6)
@@ -104,6 +104,7 @@ THUMBSIDE = 0.05
 #========================== HELPER FUNCTIONS ==========================#
 #add epsilon threshold in the future for edge cases
 
+#for most of this we just compare the x or y position of the finger tip compared to its joint
 def isFingerFolded(landmarks, finger: Finger) -> bool:
     tip = landmarks.landmark[finger.tipIndex]
     pip = landmarks.landmark[finger.pipIndex]
@@ -134,14 +135,16 @@ def isThumbRight(landmarks, finger: Finger) -> bool:
     mcp = landmarks.landmark[finger.pipIndex]
     return tip.x > mcp.x
 
-
+#check the persistance of a gesture, for every frame that the gesture is detected increase its persistance until it reaches the required value
 def checkPersistence(label) -> bool:
+    #when persistence value is reached fire the gesture and reset the counter
     if(persistenceCounters[label] == PERSISTENCE):
         persistenceCounters[label] = 0
         return True
     persistenceCounters[label]+=1
     return False
 
+#reset the persistence counter and LFG
 def resetCounters():
     global lastFiredGesture
     for gestureName in persistenceCounters:
@@ -158,10 +161,10 @@ def detectGesture(landmarks: Any) -> Optional[str]:
          
         if not checkPersistence(label):
             return None
-        
+        #bounce is for gestures that we want to keep firing as long as we keep them in the camera
         if not bounce:
             return label
-        
+        #if we keep a bounce gesture in the camera dont fire it since the user hasnt put their hand back
         if lastFiredGesture == label:
             return None
         
