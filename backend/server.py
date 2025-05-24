@@ -13,8 +13,12 @@ from gestures import *
 ##we want to run at 30-fps
 
 #open camera on default cam
+print("SERVER.PY STARTED")
+
 async def gesture_server(websocket, path):
-    cap = cv2.VideoCapture(0)
+    print("Entered gesture_server")
+
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Error: Could not open webcam.")
         return
@@ -63,6 +67,7 @@ async def gesture_server(websocket, path):
 
 async def main():
     #launch a websocket local server at 8765 and wait for connection
+    print("Starting WebSocket server...")
     async with serve(gesture_server, "localhost", 8765):
         print("Gesture server listening on ws://localhost:8765")
         await asyncio.Future()

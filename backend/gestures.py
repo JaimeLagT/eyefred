@@ -1,7 +1,10 @@
 import mediapipe as mp
 from enum import Enum
 from typing import Optional, Any, Callable
-from collections import deque
+
+
+##todo: fix thumbs right
+##check if we can disable left hand
 
 #========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
