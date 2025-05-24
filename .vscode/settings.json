@@ -9,6 +9,9 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
+  "terminal.integrated.env.osx": {
+    "PYTHONPATH": "${workspaceFolder}/backend"
+  },
   // Enable Pylance strict type-checking
   "python.analysis.typeCheckingMode": "basic",
   // Electron front-end
@@ -33,5 +36,6 @@
       ]
     }
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell (venv)"
+  "terminal.integrated.defaultProfile.windows": "PowerShell (venv)",
+  "css.lint.unknownAtRules": "ignore"
 }
