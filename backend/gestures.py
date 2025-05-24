@@ -14,15 +14,6 @@ def isOpenPalm(landmarks: Any) -> bool:
     isFingerExtended(landmarks, Finger.Pinky),
     ])
 
-# def isFist(landmarks: Any) -> bool:
-#     #checks if all finders are folded aka fist
-#     return all([
-#     isThumbFolded(landmarks, Finger.Thumb),
-#     isFingerFolded(landmarks, Finger.Index),
-#     isFingerExtended(landmarks, Finger.Middle),
-#     isFingerFolded(landmarks, Finger.Ring),
-#     isFingerFolded(landmarks, Finger.Pinky),
-#     ])
 
 def isPeace(landmarks: Any)-> bool:
     return all([
@@ -91,7 +82,6 @@ persistenceCounters = {
 
 STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
     ("open_palm", isOpenPalm, True),
-    #("fist",      isFist, True),
     ("peace",     isPeace, True),
     ("rock",      isRock, True),
     ("thumbs_right", isThumbsRight, False),
