@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import './styles.css';
-
 const path = window.require('path');
 const fs = window.require('fs');
-//const actions = window.require('../actions.js');
-
+//bunch of vite nonesense tbh
+const appPathArg = process.argv.find(arg => arg.startsWith('--appPath='));
+const appPath = appPathArg?.split('=')[1] || '.';
 
 //========================== GLOBAL VARIABLES ==========================//
-const bindingsPath = path.join(__dirname, 'bindings.json');
+
+const actions = path.join(appPath, 'renderer', 'actions.json');
+const bindingsPath = path.join(appPath, 'renderer', 'bindings.json');
 
 // const actionList = [
 //     "toggleMute",
@@ -27,7 +29,7 @@ function handlePacket(event) {
     const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
     const action = bindings[gesture];
     //perform the action mapped by the gesture
-    actions.performAction(action);
+    //actions.performAction(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
@@ -35,17 +37,22 @@ function App() {
     //const [bindings, SetBindings] = useState({});
     //Websocket response
     useEffect(() => {
-        //1 create websocket
-        const socket = new WebSocket('ws://localhost:8765');
-        //2 handle incoming packets
-        socket.onmessage = (event) => {
-            handlePacket(event);
-        };
-        //3 handle unmount
+        let socket;
+        const delay = setTimeout(() => {
+            // 1. Create websocket after delay
+            socket = new WebSocket('ws://localhost:8765');
+            // 2. Handle incoming packets
+            socket.onmessage = (event) => {
+                handlePacket(event);
+            };
+        }, 1000); // wait 500ms
+
         return () => {
-            socket.close();
+            clearTimeout(delay); // cancel delayed connect if App unmounts quickly
+            if (socket) socket.close();    // optional safety to close if open
         };
     }, []);
+
     //Binding mapping update
     // useEffect(() => {
     //     SetBindings(bindingsPath);

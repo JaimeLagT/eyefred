@@ -17,6 +17,8 @@ const pythonProcess = spawn(pythonCmd, [backendPath], {
     //stdio: ['ignore', 'pipe', 'pipe']
 });
 
+console.log("🔧 Starting Python backend...");
+
 
 //UNCOMMENT FOR PIPING
 

@@ -21,7 +21,8 @@ function newBrowserWindow() {
         //in the future please change this
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            additionalArguments: [`--appPath=${__dirname}`]
         }
     });
 
