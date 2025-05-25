@@ -1,10 +1,10 @@
-const { useEffect } = require("react");
-//import React, { useState } from "react";
-import React from "react";
+import React, { useEffect } from 'react';
 import './styles.css';
-const path = require('path');
-const fs = require('fs');
-const actions = window.require('../renderer/actions.js');
+
+const path = window.require('path');
+const fs = window.require('fs');
+//const actions = window.require('../actions.js');
+
 
 //========================== GLOBAL VARIABLES ==========================//
 const bindingsPath = path.join(__dirname, 'bindings.json');

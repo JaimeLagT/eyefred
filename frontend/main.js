@@ -18,8 +18,23 @@ function newBrowserWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        //in the future please change this
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
     });
-    win.loadFile('renderer/index.html');
+
+    //vite app.jsx window loading
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    if (isDev) {
+        win.loadURL('http://localhost:5173'); // default Vite dev server
+    } else {
+        const path = require('path');
+        win.loadFile(path.join(__dirname, 'renderer', 'dist', 'index.html'));
+    }
+
     return win;
 }
 
@@ -27,6 +42,7 @@ function newBrowserWindow() {
 app.whenReady().then(() => {
     //load window
     const win = newBrowserWindow();
+    //console.log("typeof window.require:", typeof window.require);
 
     //handle window events
     app.on('window-all-closed', handleWindowClose);
