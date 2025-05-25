@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.css';
 const path = window.require('path');
 const fs = window.require('fs');
+//const actions = window.require('../actions.js');
 //bunch of vite nonesense tbh
 const appPathArg = process.argv.find(arg => arg.startsWith('--appPath='));
 const appPath = appPathArg?.split('=')[1] || '.';
+
 
 //========================== GLOBAL VARIABLES ==========================//
 
@@ -29,7 +31,7 @@ function handlePacket(event) {
     const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
     const action = bindings[gesture];
     //perform the action mapped by the gesture
-    actions.performAction(action);
+    //actions.performAction(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
