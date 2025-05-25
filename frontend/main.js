@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 require('./start-python.js');
+const path = require('path');
 
 //========================== HELPER FUNCTIONS ==========================//
 function handleWindowClose() {
@@ -32,7 +33,6 @@ function newBrowserWindow() {
     if (isDev) {
         win.loadURL('http://localhost:5173'); // default Vite dev server
     } else {
-        const path = require('path');
         win.loadFile(path.join(__dirname, 'renderer', 'dist', 'index.html'));
     }
 
