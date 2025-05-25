@@ -11,12 +11,12 @@ const appPath = appPathArg?.split('=')[1] || '.';
 const actions = path.join(appPath, 'renderer', 'actions.json');
 const bindingsPath = path.join(appPath, 'renderer', 'bindings.json');
 
-// const actionList = [
-//     "toggleMute",
-//     "playPause",
-//     "nextTrack",
-//     "previousTrack"
-// ];
+const actionList = [
+    "toggleMute",
+    "playPause",
+    "nextTrack",
+    "previousTrack"
+];
 
 //========================== HELPER FUNCTIONS ==========================//
 
@@ -29,12 +29,12 @@ function handlePacket(event) {
     const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
     const action = bindings[gesture];
     //perform the action mapped by the gesture
-    //actions.performAction(action);
+    actions.performAction(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
 function App() {
-    //const [bindings, SetBindings] = useState({});
+    const [bindings, SetBindings] = useState({});
     //Websocket response
     useEffect(() => {
         let socket;
@@ -54,11 +54,11 @@ function App() {
     }, []);
 
     //Binding mapping update
-    // useEffect(() => {
-    //     SetBindings(bindingsPath);
-    //     const parsedBindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
-    //     SetBindings(parsedBindings);
-    // }, []);
+    useEffect(() => {
+        SetBindings(bindingsPath);
+        const parsedBindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
+        SetBindings(parsedBindings);
+    }, []);
 
     return (
         <h1 className="text-2xl font-bold text-purple-500">
