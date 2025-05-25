@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional, Any, Callable
 
 
-##todo: fix thumbs right
+##todo: change thumbs to this: 👉 and that way we can get fist back
 ##check if we can disable left hand
 ##futue implementations: turn gestures on and off when user assings them
 
