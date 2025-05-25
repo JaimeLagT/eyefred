@@ -5,6 +5,7 @@ from typing import Optional, Any, Callable
 
 ##todo: fix thumbs right
 ##check if we can disable left hand
+##futue implementations: turn gestures on and off when user assings them
 
 #========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
@@ -76,7 +77,6 @@ class Finger(Enum):
 
 persistenceCounters = {
     "open_palm": 0,
-    #"fist": 0,
     "peace": 0,
     "rock":0,
     "thumbs_right":0,
