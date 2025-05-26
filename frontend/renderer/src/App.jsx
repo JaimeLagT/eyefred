@@ -54,7 +54,7 @@ function App() {
 
     return (
         <h1 className="text-2xl font-bold text-purple-500">
-            Eyefred is running 🎉
+            running
         </h1>
     );
 }

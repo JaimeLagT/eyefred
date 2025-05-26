@@ -3,6 +3,7 @@ const { contextBridge } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+
 // // resolve real file location of preload.js, even if sandboxed
 // const __filename = fileURLToPath(import.meta.url || require('url').pathToFileURL(__filename));
 // const __dirname = path.dirname(__filename);
@@ -35,5 +36,5 @@ contextBridge.exposeInMainWorld('eyefred', {
             console.error('Failed to write to bindings.json at backend:', err);
             return {};
         }
-    }
+    },
 });

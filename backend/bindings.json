@@ -1,6 +1,6 @@
 {
-    "open_palm": "",
-    "peace": "",
+    "open_palm": "playSpotify",
+    "peace": "playPause",
     "rock":"",
     "thumbs_right":"volumeUp",
     "thumbs_left":"volumeDown"
