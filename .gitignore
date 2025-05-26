@@ -12,5 +12,3 @@ build/
 .DS_Store
 
 frontend/tools/tailwindcss
-frontend/tools/tailwindcss.exe
-tailwindcss-windows-x64.exe
