@@ -1,7 +1,4 @@
 const { exec } = require('child_process');
-// const loudness = require('loudness');           // volume control
-// const open = require('open');                   // launch apps/URLs
-// const { keyboard, Key } = require("@nut-tree/nut-js"); //keybinds
 
 function performAction(actionName) {
     console.log(`(real) performAction called with: ${actionName}`);
