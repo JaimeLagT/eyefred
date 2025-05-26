@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-  "start": "electron .",
-  "build:css": "./tools/tailwindcss -i ./src/index.css -o ./dist/output.css -w",
-  "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
-  "dev:vite": "cd renderer && npm run dev",
-  "dev:electron": "wait-on http://localhost:5173 && electron ."
+    "start": "electron .",
+    "build:css": "node_modules/.bin/tailwindcss -i ./src/index.css -o ./dist/output.css --minify",
+    "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "cd renderer && npm run dev",
+    "dev:electron": "wait-on http://localhost:5173 && electron ."
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,8 @@
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "@eslint/json": "^0.12.0",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@vitejs/plugin-react": "^4.5.0",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
     "electron": "^36.3.1",
@@ -24,6 +26,7 @@
     "globals": "^16.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7",
+    "vite": "^6.3.5",
     "wait-on": "^8.0.3"
   }
 }
