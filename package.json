@@ -2,5 +2,15 @@
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "cd frontend/renderer && npm run dev",
+    "dev:electron": "wait-on http://localhost:5173 && npx electron frontend/main.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^36.3.1",
+    "wait-on": "^8.0.3"
   }
 }

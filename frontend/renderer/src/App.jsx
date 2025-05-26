@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './styles.css';
-const fs = window.require('fs');
-
-//bunch of vite nonesense tbh
-const appPathArg = process.argv.find(arg => arg.startsWith('--appPath='));
-const appPath = appPathArg?.split('=')[1] || '.';
-const path = window.require('path');
-
 //========================== GLOBAL VARIABLES ==========================//
-const bindingsPath = path.join(appPath, 'renderer', 'bindings.json');
+
 
 const actionList = [
     "toggleMute",
@@ -25,15 +18,15 @@ function handlePacket(event) {
     const gesture = data.gesture;
     console.log("Received gesture:", gesture);
     //get the newest bindings
-    const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
+    const bindings = window.eyefred.getBindings();
     const action = bindings[gesture];
     //perform the action mapped by the gesture using a context bridge
-    window.eyefred.performAction(action);
+    window.eyefred?.performAction?.(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
 function App() {
-    const [bindings, SetBindings] = useState({});
+    const [bindings, setBindings] = useState({});
     //Websocket response
     useEffect(() => {
         let socket;
@@ -54,9 +47,9 @@ function App() {
 
     //Binding mapping update
     useEffect(() => {
-        SetBindings(bindingsPath);
-        const parsedBindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
-        SetBindings(parsedBindings);
+        const bindings = window.eyefred.getBindings();
+        setBindings(bindings);
+        //use dropdown menu with actionslist to update bindings
     }, []);
 
     return (
