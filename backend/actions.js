@@ -14,11 +14,12 @@ function performAction(actionName) {
         );
     }
     else if (actionName === 'volumeUp') {
-        "osascript -e 'set cur to output volume of (get volume settings)' " +
+        exec("osascript -e 'set cur to output volume of (get volume settings)' " +
             "-e 'set tgt to cur + 10' " +
             "-e 'if tgt > 100 then set tgt to 100' " +
             "-e 'set volume output volume tgt'",
             (err) => { if (err) console.error(err) }
+        );
     }
     // Add more actions here
 }
