@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import './styles.css';
-const path = window.require('path');
 const fs = window.require('fs');
-//const actions = window.require('../actions.js');
+
 //bunch of vite nonesense tbh
 const appPathArg = process.argv.find(arg => arg.startsWith('--appPath='));
 const appPath = appPathArg?.split('=')[1] || '.';
-
+const path = window.require('path');
 
 //========================== GLOBAL VARIABLES ==========================//
-
-const actions = path.join(appPath, 'renderer', 'actions.json');
 const bindingsPath = path.join(appPath, 'renderer', 'bindings.json');
 
 const actionList = [
@@ -30,8 +27,8 @@ function handlePacket(event) {
     //get the newest bindings
     const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
     const action = bindings[gesture];
-    //perform the action mapped by the gesture
-    //actions.performAction(action);
+    //perform the action mapped by the gesture using a context bridge
+    window.eyefred.performAction(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
@@ -47,7 +44,7 @@ function App() {
             socket.onmessage = (event) => {
                 handlePacket(event);
             };
-        }, 1000); // wait 500ms
+        }, 800); // wait 500ms
 
         return () => {
             clearTimeout(delay); // cancel delayed connect if App unmounts quickly

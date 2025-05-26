@@ -21,6 +21,7 @@ function newBrowserWindow() {
         height: 600,
         //in the future please change this
         webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             contextIsolation: false,
             additionalArguments: [`--appPath=${__dirname}`]
