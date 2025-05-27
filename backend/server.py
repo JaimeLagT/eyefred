@@ -47,6 +47,8 @@ async def gesture_server(websocket, path):
                 #3 if a hand was detected pass them to detect gesture function 
                 gesture_name = None
                 if hasattr(results, "multi_hand_landmarks") and results.multi_hand_landmarks:
+                    if (results.multi_handedness[0].classification[0].label == "Right"):
+                        continue
                     gesture_name =  detectGesture(results.multi_hand_landmarks[0])
 
                 #4 if we processed a gesture wrap it into a json string and send it over a websocket packet

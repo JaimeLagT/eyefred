@@ -3,8 +3,7 @@ from enum import Enum
 from typing import Optional, Any, Callable
 
 
-##check if we can disable left hand
-##futue implementations: turn gestures on and off when user assings them
+##futue implementations: turn gestures on and off when user assings them ?
 
 #========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
