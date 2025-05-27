@@ -1,7 +1,8 @@
 {
     "open_palm": "playSpotify",
     "peace": "playPause",
-    "rock":"",
-    "thumbs_right":"volumeUp",
-    "thumbs_left":"volumeDown"
+    "rock":"openMrBeast",
+    "thumbsRight":"volumeUp",
+    "thumbsLeft":"volumeDown",
+    "fist": "speakHello"
 }

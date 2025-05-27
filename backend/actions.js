@@ -27,6 +27,21 @@ function performAction(actionName) {
         );
 
     }
+    else if (actionName === 'speakHello') {
+        exec(`say "Hello, Sofia!"`,
+            (err) => { if (err) console.error(err); }
+        );
+    }
+    else if (actionName === 'openMrBeast') {
+        exec(`osascript -e '
+        tell application "Google Chrome"
+            activate
+            open location "https://www.youtube.com/watch?v=DZIASl9q90s&ab_channel=MrBeast"
+        end tell
+        delay 2
+        tell application "System Events" to keystroke "f"
+    '`, (err) => { if (err) console.error(err); });
+    }
     // Add more actions here
 }
 
