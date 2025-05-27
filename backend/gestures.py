@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Optional, Any, Callable
 
 
-##todo: change thumbs to this: 👉 and that way we can get fist back
 ##check if we can disable left hand
 ##futue implementations: turn gestures on and off when user assings them
 
@@ -37,6 +36,14 @@ def isRock(landmarks: Any)-> bool:
         isThumbExtended(landmarks, Finger.Thumb),
     ])
 
+def isFist(landmarks: Any) -> bool:
+    return all([
+    isFingerFolded(landmarks, Finger.Index),
+    isFingerFolded(landmarks, Finger.Middle),
+    isFingerFolded(landmarks, Finger.Ring),
+    isFingerFolded(landmarks, Finger.Pinky),
+    ])
+
 def isThumbsLeft(landmarks: Any) -> bool:
     # all other fingers folded, thumb extended and pointing up
     return all([
@@ -45,7 +52,7 @@ def isThumbsLeft(landmarks: Any) -> bool:
         isFingerFolded(landmarks, Finger.Ring),
         isFingerFolded(landmarks, Finger.Pinky),
         isThumbExtended(landmarks, Finger.Thumb),
-        isThumbLeft(landmarks, Finger.Thumb),
+        isThumbLeft(landmarks, Finger.Thumb, Finger.Middle),
     ])
 
 def isThumbsRight(landmarks: Any) -> bool:
@@ -56,7 +63,7 @@ def isThumbsRight(landmarks: Any) -> bool:
         isFingerFolded(landmarks, Finger.Ring),
         isFingerFolded(landmarks, Finger.Pinky),
         #isThumbExtended(landmarks, Finger.Thumb),
-        isThumbFolded(landmarks, Finger.Thumb),
+        isThumbRight(landmarks, Finger.Thumb, Finger.Middle),
     ])
 
 #========================== GLOBAL VARIABLES ==========================#
@@ -79,20 +86,22 @@ persistenceCounters = {
     "open_palm": 0,
     "peace": 0,
     "rock":0,
-    "thumbs_right":0,
-    "thumbs_left":0,
+    "thumbsRight":0,
+    "thumbsLeft":0,
+    "fist": 0,
 }
 
 STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
     ("open_palm", isOpenPalm, True),
     ("peace",     isPeace, True),
     ("rock",      isRock, True),
-    ("thumbs_right", isThumbsRight, False),
-    ("thumbs_left", isThumbsLeft, False),
+    ("thumbsRight", isThumbsRight, False),
+    ("thumbsLeft", isThumbsLeft, False),
+    ("fist", isFist, True),
 ]
 
-PERSISTENCE = 20
-THUMBSIDE = 0.05
+PERSISTENCE = 10
+THUMBTHRESHOLD = 0.1
 
 #========================== HELPER FUNCTIONS ==========================#
 #add epsilon threshold in the future for edge cases
@@ -118,15 +127,28 @@ def isThumbExtended(landmarks, finger: Finger) -> bool:
     pip = landmarks.landmark[finger.pipIndex]
     return tip.x > pip.x
 
-def isThumbLeft(landmarks, finger: Finger) -> bool:
-    tip = landmarks.landmark[finger.tipIndex]
-    mcp = landmarks.landmark[finger.pipIndex]
-    return tip.x > mcp.x + THUMBSIDE
+def isThumbLeft(landmarks, thumb: Finger, middle: Finger) -> bool:
+    thumb_tip = landmarks.landmark[thumb.tipIndex]
+    thumb_pip = landmarks.landmark[thumb.pipIndex]
+    middle_tip = landmarks.landmark[middle.tipIndex]
 
-def isThumbRight(landmarks, finger: Finger) -> bool:
-    tip = landmarks.landmark[finger.tipIndex]
-    mcp = landmarks.landmark[finger.pipIndex]
-    return tip.x > mcp.x
+    # Check if thumb is too close to the middle finger (i.e. folded in)
+    if abs(thumb_tip.x - middle_tip.x) < THUMBTHRESHOLD:  
+        return False
+    
+    return thumb_tip.x > thumb_pip.x 
+
+def isThumbRight(landmarks, thumb: Finger, middle: Finger) -> bool:
+    thumb_tip = landmarks.landmark[thumb.tipIndex]
+    thumb_pip = landmarks.landmark[thumb.pipIndex]
+    middle_tip = landmarks.landmark[middle.tipIndex]
+
+    # Check if thumb is too close to the middle finger (i.e. folded in)
+    if abs(thumb_tip.x - middle_tip.x) < THUMBTHRESHOLD:  # threshold can be tuned
+        return False
+
+    return thumb_tip.x < thumb_pip.x
+
 
 #check the persistance of a gesture, for every frame that the gesture is detected increase its persistance until it reaches the required value
 def checkPersistence(label) -> bool:
