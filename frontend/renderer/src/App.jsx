@@ -25,7 +25,7 @@ function handlePacket(event) {
 }
 
 //========================== MAIN FUNCTION ==========================//
-function App() {
+export default function App() {
     const [bindings, setBindings] = useState({});
     //Websocket response
     useEffect(() => {
@@ -45,18 +45,23 @@ function App() {
         };
     }, []);
 
+    //load initial bindings
+    useEffect(() => {
+        const initial = window.eyefred.getBindings();
+        setBindings(initial || {});
+    }, []);
+
     //Binding mapping update
     useEffect(() => {
-        const bindings = window.eyefred.getBindings();
+        const bindings = window.eyefred.setBindings();
         setBindings(bindings);
         //use dropdown menu with actionslist to update bindings
     }, []);
 
-    return (
-        <h1 className="text-2xl font-bold text-purple-500">
 
-        </h1>
+
+
+    return (
+        
     );
 }
-
-export default App;
