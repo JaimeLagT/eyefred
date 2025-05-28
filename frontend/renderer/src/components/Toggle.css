@@ -1,0 +1,25 @@
+.toggle-container {
+  position: absolute;
+  top: 2em;
+  right: 2em;
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-icon {
+  font-size: 1.5em;
+  transition: color 0.5s ease-in-out;
+  color: var(--toggle-icon-color); /* define in your light/dark CSS */
+}

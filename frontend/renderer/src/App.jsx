@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './styles.css';
-
+import { Toggle } from './components/Toggle';
 
 //========================== GLOBAL VARIABLES ==========================//
 const actionList = [
@@ -51,6 +51,7 @@ function handlePacket(event) {
 //========================== MAIN FUNCTION ==========================//
 function App() {
     const [bindings, setBindings] = useState({});
+    const [isDark, setIsDark] = useState(false);
 
     // WebSocket setup
     useEffect(() => {
@@ -71,6 +72,17 @@ function App() {
         const initial = window.eyefred.getBindings();
         setBindings(initial);
     }, []);
+
+    // Whenever isDark changes, toggle the body class
+    useEffect(() => {
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            document.body.classList.remove('light-mode');
+        } else {
+            document.body.classList.add('light-mode');
+            document.body.classList.remove('dark-mode');
+        }
+    }, [isDark]);
 
     // Handle dropdown change
     const handleChange = (gesture) => async (e) => {
@@ -95,9 +107,10 @@ function App() {
         await window.eyefred.setBindings(cleared);
     };
 
+
     //===================================== UI =====================================//
     return (
-        <div className="app-container">
+        <div className={"app-container"}>
             {/* Invisible draggable strip at the top for moving a frameless window */}
             <div className="drag-region" />
 
@@ -105,6 +118,10 @@ function App() {
             <header className="app-header">
                 <h1>Eyefred Gesture Mappings</h1>
                 <p>Select an action for each gesture:</p>
+                <Toggle
+                    isChecked={isDark}
+                    handleChange={() => setIsDark(!isDark)}
+                ></Toggle>
             </header>
 
             <main>
