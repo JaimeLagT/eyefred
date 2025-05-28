@@ -3,13 +3,8 @@ import './styles.css';
 
 
 
-// TMR SHIPPING:
-//you can still select the action but it will deselect the previous one
-//add more actions and clean file up
-
 //========================== GLOBAL VARIABLES ==========================//
 const actionList = [
-    //"toggleMute",
     "Play / Pause",
     "Open Spotify",
     "Switch Window (Right)",
@@ -18,7 +13,15 @@ const actionList = [
     "Mission Control",
     "Volume Up",
     "Volume Down",
-
+    'Toggle Do Not Disturb',
+    'Lock Screen',
+    'Take Screenshot',
+    'Toggle Microphone Mute',
+    'Show Desktop',
+    'Next Track',
+    'Previous Track',
+    'Go to Netflix',
+    'Go to YouTube'
 ];
 
 const gestureIcons = {
@@ -27,7 +30,7 @@ const gestureIcons = {
     rock: '🤟',
     thumbsRight: '👍',
     thumbsLeft: '👍',
-    fist: '👊',
+    fist: '✊',
     palmLeft: '👋',
     palmRight: '👋',
 };
@@ -95,6 +98,7 @@ function App() {
     //===================================== UI =====================================//
     return (
         <div className="app-container">
+            {/* Drag region for frameless window movement */}
             <div className="drag-region" />
 
             <header className="app-header">
@@ -103,9 +107,10 @@ function App() {
             </header>
 
             <main>
+                {/* Grid of gesture cards */}
                 <div className="grid-container">
                     {Object.keys(bindings).map((gesture) => {
-                        // Compute the correct transform class for this gesture:
+                        // Determine the transform class for gesture icon orientation
                         const transformClass = flippedHGestures.has(gesture)
                             ? 'flipped'
                             : flipped90Gestures.has(gesture)
@@ -116,6 +121,7 @@ function App() {
 
                         return (
                             <div key={gesture} className="card">
+                                {/* Gesture icon and label */}
                                 <label className="card-label">
                                     <span
                                         role="img"
@@ -125,6 +131,7 @@ function App() {
                                         {gestureIcons[gesture] || gesture}
                                     </span>
                                 </label>
+                                {/* Dropdown to select action for this gesture */}
                                 <select
                                     className="card-select"
                                     value={bindings[gesture] || ''}
@@ -137,10 +144,6 @@ function App() {
                                         <option
                                             key={action}
                                             value={action}
-                                            disabled={
-                                                Object.values(bindings).includes(action) &&
-                                                bindings[gesture] !== action
-                                            }
                                         >
                                             {action}
                                         </option>
@@ -151,6 +154,7 @@ function App() {
                     })}
                 </div>
 
+                {/* Reset all mappings button */}
                 <div className="reset-container">
                     <button className="reset-button" onClick={resetAll}>
                         Reset All
