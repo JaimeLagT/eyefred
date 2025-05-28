@@ -1,4 +1,14 @@
 /* Global resets */
+
+.drag-region {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;              /* macOS traffic-light height */
+  -webkit-app-region: drag;  /* makes it draggable */
+  z-index: 100;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -112,6 +122,6 @@ body {
   background: #c0392b;
 }
 
-.drag-region-header {
-  -webkit-app-region: drag;
+.drag-region{
+    -webkit-app-region: drag;
 }

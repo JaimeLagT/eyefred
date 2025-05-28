@@ -68,10 +68,14 @@ function App() {
 
     return (
         <div className="app-container">
-            <header className="app-header drag-region-header">
+            <div className="drag-region">
+            </div>
+
+            <header className="app-header">
                 <h1>Eyefred Gesture Mappings</h1>
                 <p>Select an action for each gesture:</p>
             </header>
+
             <main>
                 <div className="grid-container">
                     {Object.keys(bindings).map((gesture) => (
@@ -82,12 +86,17 @@ function App() {
                                 value={bindings[gesture] || ''}
                                 onChange={handleChange(gesture)}
                             >
-                                <option value="" disabled>Select action</option>
+                                <option value="" disabled>
+                                    Select action
+                                </option>
                                 {actionList.map((action) => (
                                     <option
                                         key={action}
                                         value={action}
-                                        disabled={Object.values(bindings).includes(action) && bindings[gesture] !== action}
+                                        disabled={
+                                            Object.values(bindings).includes(action) &&
+                                            bindings[gesture] !== action
+                                        }
                                     >
                                         {action}
                                     </option>
@@ -96,6 +105,7 @@ function App() {
                         </div>
                     ))}
                 </div>
+
                 <div className="reset-container">
                     <button className="reset-button" onClick={resetAll}>
                         Reset All
@@ -103,6 +113,7 @@ function App() {
                 </div>
             </main>
         </div>
+
     );
 }
 
