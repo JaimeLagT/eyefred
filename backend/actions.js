@@ -140,11 +140,11 @@ function showDesktop() {
 }
 
 function nextMedia() {
-    exec("osascript -e 'tell application \"Spotify\" to next track", logError);
+    exec("osascript -e 'tell application \"Spotify\" to next track'", logError);
 }
 
 function prevMedia() {
-    exec("osascript -e 'tell application \"Spotify\" to previous track", logError);
+    exec("osascript -e 'tell application \"Spotify\" to previous track'", logError);
 }
 
 

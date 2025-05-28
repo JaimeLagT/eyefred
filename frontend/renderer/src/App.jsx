@@ -93,7 +93,6 @@ function App() {
             if (updated[g] === newAction) updated[g] = '';
         });
         updated[gesture] = newAction;
-        // actionList.at(newAction).join(' ', gestureIcons.gesture);
         setBindings(updated);
         await window.eyefred.setBindings(updated);
     };
