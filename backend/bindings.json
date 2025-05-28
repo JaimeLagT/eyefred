@@ -1,10 +1,10 @@
 {
-  "openPalm": "Open Spotify",
-  "peace": "Mission Control",
+  "openPalm": "Mission Control",
+  "peace": "",
   "rock": "Open Google",
-  "fist": "",
+  "fist": "Play / Pause",
   "thumbsLeft": "Volume Down",
   "thumbsRight": "Volume Up",
-  "palmLeft": "Switch Window (Left)",
-  "palmRight": "Switch Window (Right)"
+  "palmLeft": "Previous Track",
+  "palmRight": "Next Track"
 }
