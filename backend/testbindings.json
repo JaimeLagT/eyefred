@@ -1,0 +1,10 @@
+{
+    "openPalm": "playSpotify",
+    "peace": "playPause",
+    "rock":"openGoogle",
+    "thumbsRight":"volumeUp",
+    "thumbsLeft":"volumeDown",
+    "fist": "swipeUp",
+    "palmLeft": "swipeLeft",
+    "palmRight": "swipeRight"
+}
