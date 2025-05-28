@@ -2,6 +2,7 @@ const { exec } = require('child_process');
 
 function performAction(actionName) {
     console.log(`(real) performAction called with: ${actionName}`);
+
     if (actionName === 'playSpotify') {
         exec('open -a Spotify'); // macOS example
     } else if (actionName === 'volumeDown') {
@@ -25,11 +26,25 @@ function performAction(actionName) {
         exec(`osascript -e 'tell application "Spotify" to playpause'`,
             (err) => { if (err) console.error(err) }
         );
-
     }
     else if (actionName === 'speakHello') {
         exec(`say "Hello, Sofia!"`,
             (err) => { if (err) console.error(err); }
+        );
+    }
+    else if (actionName === 'swipeUp') {
+        exec(`osascript -e 'tell application "System Events" to key code 126 using control down'`,
+            (err) => { if (err) console.error(err); }
+        );
+    }
+    else if (actionName === 'swipeRight') {
+        exec(`osascript -e 'tell application "System Events" to key code 124 using control down'`,
+            (err) => { if (err) console.error(err) }
+        );
+    }
+    else if (actionName === 'swipeLeft') {
+        exec(`osascript -e 'tell application "System Events" to key code 123 using control down'`,
+            (err) => { if (err) console.error(err) }
         );
     }
     else if (actionName === 'openMrBeast') {

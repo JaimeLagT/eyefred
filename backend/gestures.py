@@ -61,8 +61,23 @@ def isThumbsRight(landmarks: Any) -> bool:
         isFingerFolded(landmarks, Finger.Middle),
         isFingerFolded(landmarks, Finger.Ring),
         isFingerFolded(landmarks, Finger.Pinky),
-        #isThumbExtended(landmarks, Finger.Thumb),
         isThumbRight(landmarks, Finger.Thumb, Finger.Middle),
+    ])
+
+def isPalmLeft(landmarks: Any) -> bool:
+    return all([
+        isFingerLeft(landmarks, Finger.Index),
+        isFingerLeft(landmarks, Finger.Middle),
+        isFingerLeft(landmarks, Finger.Ring),
+        isFingerLeft(landmarks, Finger.Pinky),
+    ])
+
+def isPalmRight(landmarks: Any) -> bool:
+    return all([
+        isFingerRight(landmarks, Finger.Index),
+        isFingerRight(landmarks, Finger.Middle),
+        isFingerRight(landmarks, Finger.Ring),
+        isFingerRight(landmarks, Finger.Pinky),
     ])
 
 #========================== GLOBAL VARIABLES ==========================#
@@ -82,25 +97,30 @@ class Finger(Enum):
         self.pipIndex = pipIndex
 
 persistenceCounters = {
-    "open_palm": 0,
+    "openPalm": 0,
     "peace": 0,
     "rock":0,
     "thumbsRight":0,
     "thumbsLeft":0,
     "fist": 0,
+    "palmLeft": 0,
+    "palmRight": 0,
 }
 
 STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
-    ("open_palm", isOpenPalm, True),
+    ("openPalm", isOpenPalm, True),
     ("peace",     isPeace, True),
     ("rock",      isRock, True),
     ("thumbsRight", isThumbsRight, False),
     ("thumbsLeft", isThumbsLeft, False),
     ("fist", isFist, True),
+    ("palmRight", isPalmRight, True),
+    ("palmLeft", isPalmLeft, True),
 ]
 
 PERSISTENCE = 10
 THUMBTHRESHOLD = 0.1
+HORISONTALTHRESHOLD = 0.05
 
 #========================== HELPER FUNCTIONS ==========================#
 #add epsilon threshold in the future for edge cases
@@ -114,7 +134,11 @@ def isFingerFolded(landmarks, finger: Finger) -> bool:
 def isFingerExtended(landmarks, finger: Finger) -> bool:
     tip = landmarks.landmark[finger.tipIndex]
     pip = landmarks.landmark[finger.pipIndex]
-    return tip.y < pip.y
+
+    fingerX = tip.x - pip.x
+    fingerY = tip.y - pip.y
+
+    return tip.y < pip.y and (abs(fingerX) < abs(fingerY))
 
 def isThumbFolded(landmarks, finger: Finger) -> bool:
     tip = landmarks.landmark[finger.tipIndex]
@@ -138,15 +162,41 @@ def isThumbLeft(landmarks, thumb: Finger, middle: Finger) -> bool:
     return thumb_tip.x > thumb_pip.x 
 
 def isThumbRight(landmarks, thumb: Finger, middle: Finger) -> bool:
-    thumb_tip = landmarks.landmark[thumb.tipIndex]
-    thumb_pip = landmarks.landmark[thumb.pipIndex]
+    thumbTip = landmarks.landmark[thumb.tipIndex]
+    thumbPip = landmarks.landmark[thumb.pipIndex]
     middle_tip = landmarks.landmark[middle.tipIndex]
 
     # Check if thumb is too close to the middle finger (i.e. folded in)
-    if abs(thumb_tip.x - middle_tip.x) < THUMBTHRESHOLD:  # threshold can be tuned
+    if abs(thumbTip.x - middle_tip.x) < THUMBTHRESHOLD:  # threshold can be tuned
         return False
 
-    return thumb_tip.x < thumb_pip.x
+    return thumbTip.x < thumbPip.x
+
+def isFingerLeft(landmarks, finger: Finger, horiz_thresh: float = 0.0) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    pip = landmarks.landmark[finger.pipIndex]
+
+    fingerX = tip.x - pip.x
+    fingerY = tip.y - pip.y
+
+    # 1) fingerX < 0 → pointing left
+    # 2) abs(fingerX) > abs(fingerY) → more horizontal than vertical
+
+    return (fingerX > 0) and (abs(fingerX) > abs(fingerY))
+    
+
+def isFingerRight(landmarks, finger: Finger, horiz_thresh: float = 0.0) -> bool:
+    tip = landmarks.landmark[finger.tipIndex]
+    pip = landmarks.landmark[finger.pipIndex]
+
+    fingerX = tip.x - pip.x
+    fingerY = tip.y - pip.y
+
+    # 1) fingerX < 0 → pointing right
+    # 2) abs(fingerX) > abs(fingerY) → more horizontal than vertical
+
+    return (fingerX < 0) and (abs(fingerX) + HORISONTALTHRESHOLD > abs(fingerY))
+    
 
 
 #check the persistance of a gesture, for every frame that the gesture is detected increase its persistance until it reaches the required value

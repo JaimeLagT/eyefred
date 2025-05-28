@@ -1,8 +1,10 @@
 {
-    "open_palm": "playSpotify",
+    "openPalm": "playSpotify",
     "peace": "playPause",
     "rock":"openMrBeast",
     "thumbsRight":"volumeUp",
     "thumbsLeft":"volumeDown",
-    "fist": "speakHello"
+    "fist": "swipeUp",
+    "palmLeft": "swipeLeft",
+    "palmRight": "swipeRight"
 }
