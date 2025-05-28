@@ -3,9 +3,9 @@ const { exec } = require('child_process');
 function performAction(actionName) {
     console.log(`(real) performAction called with: ${actionName}`);
 
-    if (actionName === 'playSpotify') {
+    if (actionName === 'Play Spotify') {
         exec('open -a Spotify'); // macOS example
-    } else if (actionName === 'volumeDown') {
+    } else if (actionName === 'Volume Down') {
         exec(
             "osascript -e 'set cur to output volume of (get volume settings)' " +
             "-e 'set tgt to cur - 20' " +
@@ -14,7 +14,7 @@ function performAction(actionName) {
             (err) => { if (err) console.error(err) }
         );
     }
-    else if (actionName === 'volumeUp') {
+    else if (actionName === 'Volume Up') {
         exec("osascript -e 'set cur to output volume of (get volume settings)' " +
             "-e 'set tgt to cur + 20' " +
             "-e 'if tgt > 100 then set tgt to 100' " +
@@ -32,17 +32,17 @@ function performAction(actionName) {
             (err) => { if (err) console.error(err); }
         );
     }
-    else if (actionName === 'missionControl') {
+    else if (actionName === 'Mission Control') {
         exec(`osascript -e 'tell application "System Events" to key code 126 using control down'`,
             (err) => { if (err) console.error(err); }
         );
     }
-    else if (actionName === 'swipeRight') {
+    else if (actionName === 'Switch Window (Right)') {
         exec(`osascript -e 'tell application "System Events" to key code 124 using control down'`,
             (err) => { if (err) console.error(err) }
         );
     }
-    else if (actionName === 'swipeLeft') {
+    else if (actionName === 'swiSwitch Window (Left)') {
         exec(`osascript -e 'tell application "System Events" to key code 123 using control down'`,
             (err) => { if (err) console.error(err) }
         );
@@ -57,7 +57,7 @@ function performAction(actionName) {
         tell application "System Events" to keystroke "f"
     '`, (err) => { if (err) console.error(err); });
     }
-    else if (actionName === 'openGoogle') {
+    else if (actionName === 'Open Google') {
         exec(`osascript -e '
         tell application "Google Chrome"
             activate

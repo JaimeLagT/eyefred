@@ -7,7 +7,9 @@ const actionList = [
     "Play / Pause",
     "Open Spotify",
     "Switch Window (Right)",
-    "Switch Window (Left)"
+    "Switch Window (Left)",
+    "Open Google",
+    "Mission Control"
 ];
 
 const gestureIcons = {
