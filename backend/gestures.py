@@ -4,6 +4,7 @@ from typing import Optional, Any, Callable
 
 
 ##futue implementations: turn gestures on and off when user assings them ?
+##future implementations: let users edit the persistance
 
 #========================== GESTURE FUNCTIONS ==========================#
 def isOpenPalm(landmarks: Any) -> bool:
@@ -118,7 +119,7 @@ STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
     ("palmLeft", isPalmLeft, True),
 ]
 
-PERSISTENCE = 10
+PERSISTENCE = 5
 THUMBTHRESHOLD = 0.1
 HORISONTALTHRESHOLD = 0.1
 
@@ -182,7 +183,7 @@ def isFingerLeft(landmarks, finger: Finger, horiz_thresh: float = 0.0) -> bool:
     # 1) fingerX < 0 → pointing left
     # 2) abs(fingerX) > abs(fingerY) → more horizontal than vertical
 
-    return (fingerX > 0) and (abs(fingerX) > abs(fingerY))
+    return (fingerX > 0) and (abs(fingerX) + HORISONTALTHRESHOLD > abs(fingerY))
     
 
 def isFingerRight(landmarks, finger: Finger, horiz_thresh: float = 0.0) -> bool:

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import './styles.css';
 
 
+
+// TMR SHIPPING:
 //you can still select the action but it will deselect the previous one
+//add more actions and clean file up
 
 //========================== GLOBAL VARIABLES ==========================//
 const actionList = [
