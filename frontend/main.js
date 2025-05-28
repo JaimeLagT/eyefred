@@ -16,20 +16,23 @@ function handleWindowOpen() {
 }
 
 function newBrowserWindow() {
+    const isDev = process.env.NODE_ENV !== 'production';
+
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 500,
+        height: 650,
+        titleBarStyle: 'hiddenInset',
         //in the future please change this
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            additionalArguments: [`--appPath=${__dirname}`]
+            preload: path.join(__dirname, '..', 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+            additionalArguments: [`--appPath=${__dirname}`],
+            nodeIntegrationInWorker: isDev,
         }
     });
 
     //vite app.jsx window loading
-    const isDev = process.env.NODE_ENV !== 'production';
-
     if (isDev) {
         win.loadURL('http://localhost:5173'); // default Vite dev server
     } else {
@@ -42,6 +45,8 @@ function newBrowserWindow() {
 //========================== MAIN FUNCTION ==========================//
 app.whenReady().then(() => {
     //load window
+    console.log("🧠 Using preload path:", path.join(__dirname, '..', 'preload.js'));
+
     const win = newBrowserWindow();
     //console.log("typeof window.require:", typeof window.require);
 

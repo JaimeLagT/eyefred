@@ -1,72 +1,191 @@
 import React, { useEffect, useState } from 'react';
 import './styles.css';
-const path = window.require('path');
-const fs = window.require('fs');
-//const actions = window.require('../actions.js');
-//bunch of vite nonesense tbh
-const appPathArg = process.argv.find(arg => arg.startsWith('--appPath='));
-const appPath = appPathArg?.split('=')[1] || '.';
-
+import { Toggle } from './components/Toggle';
 
 //========================== GLOBAL VARIABLES ==========================//
-
-const actions = path.join(appPath, 'renderer', 'actions.json');
-const bindingsPath = path.join(appPath, 'renderer', 'bindings.json');
-
 const actionList = [
-    "toggleMute",
-    "playPause",
-    "nextTrack",
-    "previousTrack"
+    "Play / Pause",
+    "Open Spotify",
+    "Switch Window (Right)",
+    "Switch Window (Left)",
+    "Open Google",
+    "Mission Control",
+    "Volume Up",
+    "Volume Down",
+    'Toggle Do Not Disturb',
+    'Lock Screen',
+    'Take Screenshot',
+    'Toggle Microphone Mute',
+    'Show Desktop',
+    'Next Track',
+    'Previous Track',
+    'Go to Netflix',
+    'Go to YouTube'
 ];
 
-//========================== HELPER FUNCTIONS ==========================//
+const gestureIcons = {
+    openPalm: '🖐️',
+    peace: '✌️',
+    rock: '🤟',
+    thumbsRight: '👍',
+    thumbsLeft: '👍',
+    fist: '✊',
+    palmLeft: '👋',
+    palmRight: '👋',
+};
 
+const flippedHGestures = new Set(["palmRight", "rock"]);
+const flipped90Gestures = new Set(["thumbsRight"]);
+const flippedNeg90Gestures = new Set(["thumbsLeft"]);
+
+//========================== HELPER FUNCTIONS ==========================//
 function handlePacket(event) {
-    //transform JSON gesture to a string
     const data = JSON.parse(event.data);
     const gesture = data.gesture;
     console.log("Received gesture:", gesture);
-    //get the newest bindings
-    const bindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
+    const bindings = window.eyefred.getBindings();
     const action = bindings[gesture];
-    //perform the action mapped by the gesture
-    //actions.performAction(action);
+    window.eyefred?.performAction?.(action);
 }
 
 //========================== MAIN FUNCTION ==========================//
 function App() {
-    const [bindings, SetBindings] = useState({});
-    //Websocket response
+    const [bindings, setBindings] = useState({});
+    const [isDark, setIsDark] = useState(false);
+
+    // WebSocket setup
     useEffect(() => {
         let socket;
         const delay = setTimeout(() => {
-            // 1. Create websocket after delay
             socket = new WebSocket('ws://localhost:8765');
-            // 2. Handle incoming packets
-            socket.onmessage = (event) => {
-                handlePacket(event);
-            };
-        }, 1000); // wait 500ms
+            socket.onmessage = handlePacket;
+        }, 1200);
 
         return () => {
-            clearTimeout(delay); // cancel delayed connect if App unmounts quickly
-            if (socket) socket.close();    // optional safety to close if open
+            clearTimeout(delay);
+            if (socket) socket.close();
         };
     }, []);
 
-    //Binding mapping update
+    // Load bindings on mount
     useEffect(() => {
-        SetBindings(bindingsPath);
-        const parsedBindings = JSON.parse(fs.readFileSync(bindingsPath, 'utf8'));
-        SetBindings(parsedBindings);
+        const initial = window.eyefred.getBindings();
+        setBindings(initial);
     }, []);
 
+    // Whenever isDark changes, toggle the body class
+    useEffect(() => {
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            document.body.classList.remove('light-mode');
+        } else {
+            document.body.classList.add('light-mode');
+            document.body.classList.remove('dark-mode');
+        }
+    }, [isDark]);
+
+    // Handle dropdown change
+    const handleChange = (gesture) => async (e) => {
+        const newAction = e.target.value;
+        const updated = { ...bindings };
+        // Remove this action from any other gesture
+        Object.keys(updated).forEach(g => {
+            if (updated[g] === newAction) updated[g] = '';
+        });
+        updated[gesture] = newAction;
+        setBindings(updated);
+        await window.eyefred.setBindings(updated);
+    };
+
+    // Reset all mappings
+    const resetAll = async () => {
+        const cleared = Object.fromEntries(
+            Object.keys(bindings).map(g => [g, ''])
+        );
+        setBindings(cleared);
+        await window.eyefred.setBindings(cleared);
+    };
+
+
+    //===================================== UI =====================================//
     return (
-        <h1 className="text-2xl font-bold text-purple-500">
-            Eyefred is running 🎉
-        </h1>
+        <div className={"app-container"}>
+            {/* Invisible draggable strip at the top for moving a frameless window */}
+            <div className="drag-region" />
+
+            {/* App title and subtitle */}
+            <header className="app-header">
+                <h1>Eyefred Gesture Mappings</h1>
+                <p>Select an action for each gesture:</p>
+                <Toggle
+                    isChecked={isDark}
+                    handleChange={() => setIsDark(!isDark)}
+                ></Toggle>
+            </header>
+
+            <main>
+                {/* Grid layout to hold one “card” per gesture */}
+                <div className="grid-container">
+                    {Object.keys(bindings).map((gesture) => {
+                        // Decide which CSS class to apply for rotating/flipping the emoji
+                        const transformClass = flippedHGestures.has(gesture)
+                            ? 'flipped'              // horizontal mirror
+                            : flipped90Gestures.has(gesture)
+                                ? 'point-right'      //  90° rotate
+                                : flippedNeg90Gestures.has(gesture)
+                                    ? 'point-left'   // -90° rotate
+                                    : '';            // no transform
+
+                        return (
+                            <div key={gesture} className="card">
+                                {/* Show the gesture icon (or name) with transform applied */}
+                                <label className="card-label">
+                                    <span
+                                        role="img"
+                                        aria-label={gesture}
+                                        className={`emoji ${transformClass}`}
+                                    >
+                                        {gestureIcons[gesture] || gesture}
+                                    </span>
+                                </label>
+
+                                {/* Dropdown for assigning an action to this gesture */}
+                                <select
+                                    className="card-select"
+                                    value={bindings[gesture] || ''}
+                                    onChange={handleChange(gesture)}
+                                >
+                                    {/* Placeholder prompt */}
+                                    <option value="" disabled>
+                                        Select action
+                                    </option>
+
+                                    {/* List all possible actions */}
+                                    {actionList.map((action) => (
+                                        <option
+                                            key={action}
+                                            value={action}
+                                        >
+                                            {action}
+
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Button to clear every mapping back to unassigned */}
+                <div className="reset-container">
+                    <button className="reset-button" onClick={resetAll}>
+                        Reset All
+                    </button>
+                </div>
+            </main>
+        </div>
     );
+
 }
 
 export default App;
