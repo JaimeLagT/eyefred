@@ -120,7 +120,7 @@ STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
 
 PERSISTENCE = 10
 THUMBTHRESHOLD = 0.1
-HORISONTALTHRESHOLD = 0.05
+HORISONTALTHRESHOLD = 0.1
 
 #========================== HELPER FUNCTIONS ==========================#
 #add epsilon threshold in the future for edge cases

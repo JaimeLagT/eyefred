@@ -28,5 +28,14 @@
     "tailwindcss": "^4.1.7",
     "vite": "^6.3.5",
     "wait-on": "^8.0.3"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "bootstrap": "^5.3.6",
+    "react-bootstrap": "^2.10.10"
   }
 }

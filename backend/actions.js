@@ -57,6 +57,13 @@ function performAction(actionName) {
         tell application "System Events" to keystroke "f"
     '`, (err) => { if (err) console.error(err); });
     }
+    else if (actionName === 'openGoogle') {
+        exec(`osascript -e '
+        tell application "Google Chrome"
+            activate
+        end tell
+    '`, (err) => { if (err) console.error(err); });
+    }
     // Add more actions here
 }
 
