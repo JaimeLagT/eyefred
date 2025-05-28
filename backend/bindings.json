@@ -1,9 +1,9 @@
 {
-  "openPalm": "",
-  "peace": "nextTrack",
-  "rock": "previousTrack",
-  "thumbsRight": "toggleMute",
-  "thumbsLeft": "playPause",
+  "openPalm": "Play / Pause",
+  "peace": "",
+  "rock": "",
+  "thumbsRight": "",
+  "thumbsLeft": "",
   "fist": "",
   "palmLeft": "",
   "palmRight": ""

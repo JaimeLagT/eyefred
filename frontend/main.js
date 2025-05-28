@@ -20,7 +20,7 @@ function newBrowserWindow() {
 
     const win = new BrowserWindow({
         width: 500,
-        height: 600,
+        height: 650,
         titleBarStyle: 'hiddenInset',
         //in the future please change this
         webPreferences: {

@@ -22,7 +22,7 @@ function performAction(actionName) {
             (err) => { if (err) console.error(err) }
         );
     }
-    else if (actionName === 'playPause') {
+    else if (actionName === 'Play / Pause') {
         exec(`osascript -e 'tell application "Spotify" to playpause'`,
             (err) => { if (err) console.error(err) }
         );
