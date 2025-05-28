@@ -19,8 +19,9 @@ function newBrowserWindow() {
     const isDev = process.env.NODE_ENV !== 'production';
 
     const win = new BrowserWindow({
-        width: 800,
+        width: 500,
         height: 600,
+        titleBarStyle: 'hiddenInset',
         //in the future please change this
         webPreferences: {
             preload: path.join(__dirname, '..', 'preload.js'),

@@ -32,7 +32,7 @@ function performAction(actionName) {
             (err) => { if (err) console.error(err); }
         );
     }
-    else if (actionName === 'swipeUp') {
+    else if (actionName === 'missionControl') {
         exec(`osascript -e 'tell application "System Events" to key code 126 using control down'`,
             (err) => { if (err) console.error(err); }
         );
