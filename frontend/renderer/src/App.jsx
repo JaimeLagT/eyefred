@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './styles.css';
 
 
-
 //========================== GLOBAL VARIABLES ==========================//
 const actionList = [
     "Play / Pause",
@@ -35,7 +34,7 @@ const gestureIcons = {
     palmRight: '👋',
 };
 
-const flippedHGestures = new Set(["palmRight"]);
+const flippedHGestures = new Set(["palmRight", "rock"]);
 const flipped90Gestures = new Set(["thumbsRight"]);
 const flippedNeg90Gestures = new Set(["thumbsLeft"]);
 
@@ -82,6 +81,7 @@ function App() {
             if (updated[g] === newAction) updated[g] = '';
         });
         updated[gesture] = newAction;
+        // actionList.at(newAction).join(' ', gestureIcons.gesture);
         setBindings(updated);
         await window.eyefred.setBindings(updated);
     };
@@ -98,30 +98,31 @@ function App() {
     //===================================== UI =====================================//
     return (
         <div className="app-container">
-            {/* Drag region for frameless window movement */}
+            {/* Invisible draggable strip at the top for moving a frameless window */}
             <div className="drag-region" />
 
+            {/* App title and subtitle */}
             <header className="app-header">
                 <h1>Eyefred Gesture Mappings</h1>
                 <p>Select an action for each gesture:</p>
             </header>
 
             <main>
-                {/* Grid of gesture cards */}
+                {/* Grid layout to hold one “card” per gesture */}
                 <div className="grid-container">
                     {Object.keys(bindings).map((gesture) => {
-                        // Determine the transform class for gesture icon orientation
+                        // Decide which CSS class to apply for rotating/flipping the emoji
                         const transformClass = flippedHGestures.has(gesture)
-                            ? 'flipped'
+                            ? 'flipped'              // horizontal mirror
                             : flipped90Gestures.has(gesture)
-                                ? 'point-right'
+                                ? 'point-right'      //  90° rotate
                                 : flippedNeg90Gestures.has(gesture)
-                                    ? 'point-left'
-                                    : '';
+                                    ? 'point-left'   // -90° rotate
+                                    : '';            // no transform
 
                         return (
                             <div key={gesture} className="card">
-                                {/* Gesture icon and label */}
+                                {/* Show the gesture icon (or name) with transform applied */}
                                 <label className="card-label">
                                     <span
                                         role="img"
@@ -131,21 +132,26 @@ function App() {
                                         {gestureIcons[gesture] || gesture}
                                     </span>
                                 </label>
-                                {/* Dropdown to select action for this gesture */}
+
+                                {/* Dropdown for assigning an action to this gesture */}
                                 <select
                                     className="card-select"
                                     value={bindings[gesture] || ''}
                                     onChange={handleChange(gesture)}
                                 >
+                                    {/* Placeholder prompt */}
                                     <option value="" disabled>
                                         Select action
                                     </option>
+
+                                    {/* List all possible actions */}
                                     {actionList.map((action) => (
                                         <option
                                             key={action}
                                             value={action}
                                         >
                                             {action}
+
                                         </option>
                                     ))}
                                 </select>
@@ -154,7 +160,7 @@ function App() {
                     })}
                 </div>
 
-                {/* Reset all mappings button */}
+                {/* Button to clear every mapping back to unassigned */}
                 <div className="reset-container">
                     <button className="reset-button" onClick={resetAll}>
                         Reset All
@@ -163,6 +169,7 @@ function App() {
             </main>
         </div>
     );
+
 }
 
 export default App;

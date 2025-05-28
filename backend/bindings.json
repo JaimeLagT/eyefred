@@ -1,10 +1,10 @@
 {
-  "openPalm": "Mission Control",
+  "openPalm": "",
   "peace": "",
-  "rock": "Open Google",
-  "fist": "Play / Pause",
-  "thumbsLeft": "Volume Down",
-  "thumbsRight": "Volume Up",
-  "palmLeft": "Previous Track",
-  "palmRight": "Next Track"
+  "rock": "Take Screenshot",
+  "fist": "Switch Window (Left)",
+  "thumbsLeft": "",
+  "thumbsRight": "",
+  "palmLeft": "",
+  "palmRight": "Switch Window (Right)"
 }
