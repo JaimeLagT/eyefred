@@ -3,45 +3,11 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "build:backend": "python -m PyInstaller --onefile --distpath dist/backend backend/server.py",
-    "build:electron": "cross-env NODE_ENV=production electron-builder",
-    "package": "npm run build:backend && npm run build:electron",
     "start": "electron .",
     "build:css": "node_modules/.bin/tailwindcss -i ./src/index.css -o ./dist/output.css --minify",
     "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "cd renderer && npm run dev",
     "dev:electron": "wait-on http://localhost:5173 && electron ."
-  },
-  "build": {
-    "appId": "com.jaimelagunas.eyefred",
-    "productName": "Eyefred",
-    "directories": {
-      "output": "release",
-      "buildResources": "assets"
-    },
-    "files": [
-      "main.js",
-      "preload.js",
-      "renderer/**",
-      "bindings.json",
-      "dist/backend/server"
-    ],
-    "extraResources": [
-      {
-        "from": "dist/backend/server",
-        "to": "backend/server",
-        "filter": ["**/*"]
-      }
-    ],
-    "mac": {
-      "target": ["dmg", "zip"]
-    },
-    "win": {
-      "target": ["nsis", "zip"]
-    },
-    "linux": {
-      "target": ["AppImage", "deb"]
-    }
   },
   "keywords": [],
   "author": "",
@@ -54,9 +20,7 @@
     "@vitejs/plugin-react": "^4.5.0",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
-    "cross-env": "^7.0.0",
     "electron": "^36.3.1",
-    "electron-builder": "^24.0.0",
     "eslint": "^9.27.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.1.0",

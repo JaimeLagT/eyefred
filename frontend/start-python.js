@@ -2,42 +2,52 @@ const { spawn } = require('child_process');
 const path = require('path');
 const os = require('os');
 
-//decide which python command to use based on the OS
+let pythonProcess = null;
+
+// in dev we need an interpreter; in prod we launch the binary directly
+const isProd = process.env.NODE_ENV === 'production';
 const pythonCmd = os.platform() === 'win32' ? 'python' : 'python3';
 
-//build path to server.py
-const backendPath = path.join(__dirname, "..", "backend", "server.py");
-console.log("Launching Python backend at:", backendPath);
+let cmd;
+let args = [];
 
+if (isProd) {
+    // packaged: launch the server binary itself
+    cmd = path.join(
+        process.resourcesPath,
+        'backend',
+        process.platform === 'win32' ? 'server.exe' : 'server'
+    );
+} else {
+    // dev: call python3 server.py
+    cmd = pythonCmd;
+    args = [path.join(__dirname, '..', 'backend', 'server.py')];
+}
 
-//start Python backend in background
-const pythonProcess = spawn(pythonCmd, [backendPath], {
-    stdio: 'inherit'
-    // Switch to 'pipe' if you want to filter or log gesture messages inside Electron
-    //stdio: ['ignore', 'pipe', 'pipe']
-});
+function start() {
+    if (pythonProcess) return pythonProcess;
 
-console.log("🔧 Starting Python backend...");
+    console.log(`🔧 Launching Python backend (${isProd ? 'exe' : 'script'}) at:`, cmd, ...args);
+    pythonProcess = spawn(cmd, args, { stdio: 'inherit' });
 
+    pythonProcess.on('error', err => {
+        console.error('Failed to start Python backend:', err);
+        pythonProcess = null;
+    });
+    pythonProcess.on('exit', (code, signal) => {
+        console.log(`Python backend exited (code=${code}, signal=${signal})`);
+        pythonProcess = null;
+    });
 
-//UNCOMMENT FOR PIPING
+    return pythonProcess;
+}
 
-// //whenever python script prints something print it to the terminal
-// pythonProcess.stdout.on('data', (data) => {
-//     console.log(`[Python stdout]: ${data.toString()}`);
-// });
+function stop() {
+    if (pythonProcess) {
+        console.log('🛑 Stopping Python backend...');
+        pythonProcess.kill();       // SIGTERM
+        pythonProcess = null;
+    }
+}
 
-// //same for stderr
-// pythonProcess.stderr.on('data', (data) => {
-//     console.error(`[Python stderr]: ${data.toString()}`);
-// });
-
-// //if executable cant be found or something else goes wrong print this
-// pythonProcess.on('error', (err) => {
-//     console.error(`Failed to start Python server: ${err.message}`);
-// });
-
-//print exit code
-pythonProcess.on('exit', (code) => {
-    console.log(`Python server exited with code ${code}`);
-});
+module.exports = { start, stop };

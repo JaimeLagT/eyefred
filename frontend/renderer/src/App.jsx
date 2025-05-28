@@ -59,7 +59,7 @@ function App() {
         const delay = setTimeout(() => {
             socket = new WebSocket('ws://localhost:8765');
             socket.onmessage = handlePacket;
-        }, 1200);
+        }, 1500);
 
         return () => {
             clearTimeout(delay);

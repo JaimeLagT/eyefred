@@ -1,15 +1,17 @@
 const { app, BrowserWindow } = require('electron');
-require('./start-python.js');
+const python = require('./start-python');
 const path = require('path');
 
 //========================== HELPER FUNCTIONS ==========================//
 function handleWindowClose() {
+    // On non-macOS, quit when all windows are closed
     if (process.platform !== 'darwin') {
         app.quit();
     }
 }
 
 function handleWindowOpen() {
+    // On macOS, recreate a window when the dock icon is clicked and there are no open windows
     if (BrowserWindow.getAllWindows().length === 0) {
         newBrowserWindow();
     }
@@ -22,7 +24,7 @@ function newBrowserWindow() {
         width: 500,
         height: 650,
         titleBarStyle: 'hiddenInset',
-        //in the future please change this
+        // in the future please change this
         webPreferences: {
             preload: path.join(__dirname, '..', 'preload.js'),
             nodeIntegration: false,
@@ -32,31 +34,30 @@ function newBrowserWindow() {
         }
     });
 
-    //vite app.jsx window loading
+    // vite app.jsx window loading
     if (isDev) {
         win.loadURL('http://localhost:5173'); // default Vite dev server
+        win.webContents.openDevTools();
     } else {
         win.loadFile(path.join(__dirname, 'renderer', 'dist', 'index.html'));
     }
-
-    return win;
 }
 
 //========================== MAIN FUNCTION ==========================//
-app.whenReady().then(() => {
-    //load window
-    console.log("🧠 Using preload path:", path.join(__dirname, '..', 'preload.js'));
-
-    const win = newBrowserWindow();
-    //console.log("typeof window.require:", typeof window.require);
-
-    //handle window events
-    app.on('window-all-closed', handleWindowClose);
-    app.on('activate', handleWindowOpen);
-
-    //debug for production
-    if (process.env.NODE_ENV !== 'production') {
-        win.webContents.openDevTools();
-    }
+// Kill Python backend before the app quits
+app.on('before-quit', () => {
+    python.stop();
 });
 
+// macOS: quit or recreate windows appropriately
+app.on('window-all-closed', handleWindowClose);
+app.on('activate', handleWindowOpen);
+
+app.whenReady().then(() => {
+    // start Python backend
+    python.start();
+
+    console.log("🧠 Using preload path:", path.join(__dirname, '..', 'preload.js'));
+    newBrowserWindow();
+
+});
