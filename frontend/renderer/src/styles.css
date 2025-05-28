@@ -136,9 +136,9 @@ body {
 }
 
 .emoji.point-right {
-  transform: rotate(90deg);
+  transform: rotate(90deg) scaleX(-1);
 }
 
 .emoji.point-left {
-  transform: rotate(-90deg) scaleX(-1);
+  transform: rotate(-90deg);
 }

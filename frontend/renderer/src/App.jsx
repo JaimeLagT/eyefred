@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './styles.css';
 
+
+//you can still select the action but it will deselect the previous one
+
 //========================== GLOBAL VARIABLES ==========================//
 const actionList = [
     //"toggleMute",
@@ -9,13 +12,16 @@ const actionList = [
     "Switch Window (Right)",
     "Switch Window (Left)",
     "Open Google",
-    "Mission Control"
+    "Mission Control",
+    "Volume Up",
+    "Volume Down",
+
 ];
 
 const gestureIcons = {
     openPalm: '🖐️',
     peace: '✌️',
-    rock: '🤘',
+    rock: '🤟',
     thumbsRight: '👍',
     thumbsLeft: '👍',
     fist: '👊',
@@ -24,8 +30,8 @@ const gestureIcons = {
 };
 
 const flippedHGestures = new Set(["palmRight"]);
-const flipped90Gestures = new Set(["thumbsLeft"]);
-const flippedNeg90Gestures = new Set(["thumbsRight"]);
+const flipped90Gestures = new Set(["thumbsRight"]);
+const flippedNeg90Gestures = new Set(["thumbsLeft"]);
 
 //========================== HELPER FUNCTIONS ==========================//
 function handlePacket(event) {

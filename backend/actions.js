@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 function performAction(actionName) {
     console.log(`(real) performAction called with: ${actionName}`);
 
-    if (actionName === 'Play Spotify') {
+    if (actionName === 'Open Spotify') {
         exec('open -a Spotify'); // macOS example
     } else if (actionName === 'Volume Down') {
         exec(
@@ -37,12 +37,13 @@ function performAction(actionName) {
             (err) => { if (err) console.error(err); }
         );
     }
+
     else if (actionName === 'Switch Window (Right)') {
         exec(`osascript -e 'tell application "System Events" to key code 124 using control down'`,
             (err) => { if (err) console.error(err) }
         );
     }
-    else if (actionName === 'swiSwitch Window (Left)') {
+    else if (actionName === 'Switch Window (Left)') {
         exec(`osascript -e 'tell application "System Events" to key code 123 using control down'`,
             (err) => { if (err) console.error(err) }
         );
