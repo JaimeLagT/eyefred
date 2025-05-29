@@ -24,6 +24,7 @@ function newBrowserWindow() {
         width: 500,
         height: 650,
         titleBarStyle: 'hiddenInset',
+        frame: false,
         // in the future please change this
         webPreferences: {
             preload: path.join(__dirname, '..', 'preload.js'),

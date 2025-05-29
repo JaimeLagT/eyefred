@@ -1,5 +1,9 @@
 /* Global resets */
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 .drag-region {
   position: fixed;
   top: 0;
