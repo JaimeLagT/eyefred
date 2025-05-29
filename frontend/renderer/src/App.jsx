@@ -23,6 +23,7 @@ const actionList = [
     'Go to YouTube'
 ];
 
+
 const gestureIcons = {
     openPalm: '🖐️',
     peace: '✌️',
@@ -39,14 +40,18 @@ const flipped90Gestures = new Set(["thumbsRight"]);
 const flippedNeg90Gestures = new Set(["thumbsLeft"]);
 
 //========================== HELPER FUNCTIONS ==========================//
-function handlePacket(event) {
+async function handlePacket(event) {
     const data = JSON.parse(event.data);
     const gesture = data.gesture;
     console.log("Received gesture:", gesture);
-    const bindings = window.eyefred.getBindings();
+    const bindings = await window.eyefred.getBindings();
     const action = bindings[gesture];
     window.eyefred?.performAction?.(action);
 }
+
+// function updateBindings(newSet) {
+
+// }
 
 //========================== MAIN FUNCTION ==========================//
 function App() {
@@ -69,19 +74,41 @@ function App() {
 
     // Load bindings on mount
     useEffect(() => {
-        const initial = window.eyefred.getBindings();
-        setBindings(initial);
+        (async () => { //asynch now that IPC returns a promise
+            try {
+                const data = await window.eyefred.getBindings();
+                setBindings(data);
+            } catch (err) {
+                console.error('Failed to load bindings:', err);
+                setBindings({}); // fallback
+            }
+        })();
+    }, []);
+
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const stored = await window.eyefred.getDarkPreference();
+                setIsDark(stored);
+            } catch (err) {
+                console.error("Failed to load Dark Mode Preference", err);
+                setIsDark(false);
+            }
+        })();
     }, []);
 
     // Whenever isDark changes, toggle the body class
     useEffect(() => {
-        if (isDark) {
-            document.body.classList.add('dark-mode');
-            document.body.classList.remove('light-mode');
-        } else {
-            document.body.classList.add('light-mode');
-            document.body.classList.remove('dark-mode');
-        }
+        // don’t run this while still loading
+        if (isDark === null) return;
+
+        // apply the correct class
+        document.body.classList.toggle('dark-mode', isDark);
+        document.body.classList.toggle('light-mode', !isDark);
+
+        // save exactly what we have
+        window.eyefred.setDarkPreference(isDark);
     }, [isDark]);
 
     // Handle dropdown change
@@ -103,6 +130,7 @@ function App() {
             Object.keys(bindings).map(g => [g, ''])
         );
         setBindings(cleared);
+
         await window.eyefred.setBindings(cleared);
     };
 
