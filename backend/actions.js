@@ -1,6 +1,18 @@
 const { exec } = require('child_process');
+const robot = require('robotjs');
+const os = require('os');
+// const { keyboard, Key } = require('@nut-tree-fork/nut-js');
 
 //future implementation add own OPEN: and user selects app path
+let platform = null;
+
+if (os === 'win32') {
+    platform = "windows";
+} else if (os === 'darwin') {
+    platform = "macOS";
+} else {
+    platform = 'linux';
+}
 
 //===================================== ACTION FUNCTIONS =====================================//
 
@@ -39,10 +51,7 @@ function volumeUp() {
 }
 
 function playPause() {
-    exec(
-        "osascript -e 'tell application \"Spotify\" to playpause'",
-        logError
-    );
+    robot.keyTap('audio_play')
 }
 
 function speakHello() {
@@ -94,7 +103,7 @@ function GotoNetflix() {
     exec(
         [
             "osascript -e 'tell application \"Google Chrome\" to activate'",
-            "-e 'open location \"https://www.netflix.com/browse"
+            "-e 'open location \"https://www.netflix.com/browse'"
         ].join(' '),
         logError
     );
@@ -139,12 +148,12 @@ function showDesktop() {
     );
 }
 
-function nextMedia() {
-    exec("osascript -e 'tell application \"Spotify\" to next track'", logError);
+async function nextMedia() {
+    robot.keyTap('audio_next');
 }
 
 function prevMedia() {
-    exec("osascript -e 'tell application \"Spotify\" to previous track'", logError);
+    robot.keyTap('audio_prev');
 }
 
 
