@@ -1,190 +1,277 @@
 const { exec } = require('child_process');
-const robot = require('robotjs');
 const os = require('os');
-// const { keyboard, Key } = require('@nut-tree-fork/nut-js');
 
-//future implementation add own OPEN: and user selects app path
-let platform = null;
+// Determine platform
+const platform = os.platform(); // 'win32', 'darwin', 'linux'
+const isWin = platform === 'win32';
+const isMac = platform === 'darwin';
 
-if (os === 'win32') {
-    platform = "windows";
-} else if (os === 'darwin') {
-    platform = "macOS";
-} else {
-    platform = 'linux';
+// For macOS, load robotjs for media keys
+let robot;
+if (isMac) {
+    robot = require('robotjs');
 }
-
-//===================================== ACTION FUNCTIONS =====================================//
 
 /** Error‐logging helper */
 function logError(err) {
     if (err) console.error('Action error:', err);
 }
 
-/** Action functions */
+//===================================== ACTION FUNCTIONS =====================================//
+
 function openSpotify() {
-    exec('open -a Spotify', logError);
+    if (isMac) {
+        exec('open -a Spotify', logError);
+    } else if (isWin) {
+        exec('start "" "spotify:"', logError);
+    }
 }
 
 function volumeDown() {
-    exec(
-        [
+    if (isMac) {
+        exec([
             "osascript -e 'set cur to output volume of (get volume settings)'",
             "-e 'set tgt to cur - 20'",
             "-e 'if tgt < 0 then set tgt to 0'",
             "-e 'set volume output volume tgt'"
-        ].join(' '),
-        logError
-    );
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]174)"`,
+            logError
+        );
+    }
 }
 
 function volumeUp() {
-    exec(
-        [
+    if (isMac) {
+        exec([
             "osascript -e 'set cur to output volume of (get volume settings)'",
             "-e 'set tgt to cur + 20'",
             "-e 'if tgt > 100 then set tgt to 100'",
             "-e 'set volume output volume tgt'"
-        ].join(' '),
-        logError
-    );
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]175)"`,
+            logError
+        );
+    }
 }
 
 function playPause() {
-    robot.keyTap('audio_play')
+    if (isMac) {
+        robot.keyTap('audio_play');
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]0xB3)"`,
+            logError
+        );
+    }
+}
+
+function nextMedia() {
+    if (isMac) {
+        robot.keyTap('audio_next');
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]176)"`,
+            logError
+        );
+    }
+}
+
+function prevMedia() {
+    if (isMac) {
+        robot.keyTap('audio_prev');
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys([char]177)"`,
+            logError
+        );
+    }
 }
 
 function speakHello() {
-    exec(`say "Hello, Sofia!"`, logError);
+    if (isMac) {
+        exec(`say "Hello, Sofia!"`, logError);
+    } else if (isWin) {
+        exec(
+            `powershell -Command "Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('Hello, Sofia!')"`,
+            logError
+        );
+    }
 }
 
 function missionControl() {
-    exec(
-        "osascript -e 'tell application \"System Events\" to key code 126 using control down'",
-        logError
-    );
+    if (isMac) {
+        exec(
+            "osascript -e 'tell application \"System Events\" to key code 126 using control down'",
+            logError
+        );
+    } else if (isWin) {
+        // Windows doesn't have native mission control; omitting or use Task View
+        exec(
+            `powershell -Command "Start-Process explorer -ArgumentList 'shell:::{3080F90E-D7AD-11D9-BD98-0000947B0257}'"`,
+            logError
+        );
+    }
 }
 
 function switchWindowRight() {
-    exec(
-        "osascript -e 'tell application \"System Events\" to key code 124 using control down'",
-        logError
-    );
+    if (isMac) {
+        exec(
+            "osascript -e 'tell application \"System Events\" to key code 124 using control down'",
+            logError
+        );
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys('%{TAB}')"`,
+            logError
+        );
+    }
 }
 
 function switchWindowLeft() {
-    exec(
-        "osascript -e 'tell application \"System Events\" to key code 123 using control down'",
-        logError
-    );
+    if (isMac) {
+        exec(
+            "osascript -e 'tell application \"System Events\" to key code 123 using control down'",
+            logError
+        );
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys('%+{TAB}')"`,
+            logError
+        );
+    }
+}
+
+function openGoogle() {
+    if (isMac) {
+        exec(
+            "osascript -e 'tell application \"Google Chrome\" to activate'",
+            logError
+        );
+    } else if (isWin) {
+        exec('start "" "https://www.google.com"', logError);
+    }
+}
+
+function GotoYoutube() {
+    if (isMac) {
+        exec([
+            "osascript -e 'tell application \"Google Chrome\" to activate'",
+            "-e 'open location \"https://www.youtube.com\"'"
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec('start "" "https://www.youtube.com"', logError);
+    }
+}
+
+function GotoNetflix() {
+    if (isMac) {
+        exec([
+            "osascript -e 'tell application \"Google Chrome\" to activate'",
+            "-e 'open location \"https://www.netflix.com/browse\"'"
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec('start "" "https://www.netflix.com/browse"', logError);
+    }
 }
 
 function openMrBeast() {
-    exec(
-        [
+    if (isMac) {
+        exec([
             "osascript -e 'tell application \"Google Chrome\" to activate'",
             "-e 'open location \"https://www.youtube.com/watch?v=DZIASl9q90s&ab_channel=MrBeast\"'",
             "-e 'delay 2'",
             "-e 'tell application \"System Events\" to keystroke \"f\"'"
-        ].join(' '),
-        logError
-    );
-}
-function GotoYoutube() {
-    exec(
-        [
-            "osascript -e 'tell application \"Google Chrome\" to activate'",
-            "-e 'open location \"https://www.youtube.com"
-        ].join(' '),
-        logError
-    );
-}
-function GotoNetflix() {
-    exec(
-        [
-            "osascript -e 'tell application \"Google Chrome\" to activate'",
-            "-e 'open location \"https://www.netflix.com/browse'"
-        ].join(' '),
-        logError
-    );
-}
-
-function openGoogle() {
-    exec(
-        "osascript -e 'tell application \"Google Chrome\" to activate'",
-        logError
-    );
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec('start "" "https://www.youtube.com/watch?v=DZIASl9q90s&ab_channel=MrBeast"', logError);
+    }
 }
 
 function toggleDoNotDisturb() {
-    exec(
-        "defaults -currentHost write com.apple.notificationcenterui doNotDisturb -boolean " +
-        "`defaults -currentHost read com.apple.notificationcenterui doNotDisturb | grep -q 1 && echo false || echo true` && " +
-        "killall NotificationCenter",
-        logError
-    );
+    if (isMac) {
+        exec(
+            "defaults -currentHost write com.apple.notificationcenterui doNotDisturb -boolean `defaults -currentHost read com.apple.notificationcenterui doNotDisturb | grep -q 1 && echo false || echo true` && killall NotificationCenter",
+            logError
+        );
+    } else if (isWin) {
+        // Windows DND toggle (Windows 10+) via action center: not directly scriptable
+        console.warn('Toggle Do Not Disturb not supported on Windows');
+    }
 }
 
 function lockScreen() {
-    exec("pmset displaysleepnow", logError);
+    if (isMac) {
+        exec('pmset displaysleepnow', logError);
+    } else if (isWin) {
+        exec('rundll32.exe user32.dll,LockWorkStation', logError);
+    }
 }
 
 function takeScreenshot() {
-    exec("screencapture -x ~/Desktop/screenshot_$(date +%Y%m%d_%H%M%S).png", logError);
+    if (isMac) {
+        exec("screencapture -x ~/Desktop/screenshot_$(date +%Y%m%d_%H%M%S).png", logError);
+    } else if (isWin) {
+        exec(
+            `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bmp = New-Object Drawing.Bitmap([Windows.Forms.Screen]::PrimaryScreen.Bounds.Width,[Windows.Forms.Screen]::PrimaryScreen.Bounds.Height); $graphics = [Drawing.Graphics]::FromImage($bmp); $graphics.CopyFromScreen(0,0,0,0,$bmp.Size); $bmp.Save([Environment]::GetFolderPath('Desktop') + '\\screenshot_' + (Get-Date -Format 'yyyyMMdd_HHmmss') + '.png');"`,
+            logError
+        );
+    }
 }
 
 function toggleMicrophoneMute() {
-    exec(
-        "osascript -e 'set cur to input volume of (get volume settings)' " +
-        "-e 'if cur > 0 then set volume input volume 0 else set volume input volume 100 end if'",
-        logError
-    );
+    if (isMac) {
+        exec([
+            "osascript -e 'set cur to input volume of (get volume settings)'",
+            "-e 'if cur > 0 then set volume input volume 0 else set volume input volume 100 end if'"
+        ].join(' '), logError);
+    } else if (isWin) {
+        console.warn('Toggle Microphone Mute not implemented on Windows');
+    }
 }
 
 function showDesktop() {
-    exec(
-        "osascript -e 'tell application \"System Events\" to key code 103 using control down, option down'",
-        logError
-    );
+    if (isMac) {
+        exec([
+            "osascript -e 'tell application \"System Events\" to key code 103 using {control down, option down}'"
+        ].join(' '), logError);
+    } else if (isWin) {
+        exec(
+            `powershell -Command "(New-Object -ComObject Shell.Application).MinimizeAll()"`,
+            logError
+        );
+    }
 }
-
-async function nextMedia() {
-    robot.keyTap('audio_next');
-}
-
-function prevMedia() {
-    robot.keyTap('audio_prev');
-}
-
 
 //===================================== LOOK-UP TABLE =====================================//
-
 const actionHandlers = {
     'Open Spotify': openSpotify,
     'Volume Down': volumeDown,
     'Volume Up': volumeUp,
     'Play / Pause': playPause,
+    'Next Track': nextMedia,
+    'Previous Track': prevMedia,
     'Speak Hello': speakHello,
     'Mission Control': missionControl,
     'Switch Window (Right)': switchWindowRight,
     'Switch Window (Left)': switchWindowLeft,
-    'Open MrBeast': openMrBeast,
     'Open Google': openGoogle,
+    'Go to YouTube': GotoYoutube,
+    'Go to Netflix': GotoNetflix,
+    'Open MrBeast': openMrBeast,
     'Toggle Do Not Disturb': toggleDoNotDisturb,
     'Lock Screen': lockScreen,
     'Take Screenshot': takeScreenshot,
     'Toggle Microphone Mute': toggleMicrophoneMute,
     'Show Desktop': showDesktop,
-    'Next Track': nextMedia,
-    'Previous Track': prevMedia,
-    'Go to Netflix': GotoNetflix,
-    'Go to YouTube': GotoYoutube,
-
     // …add more actions here…
 };
 
 //===================================== MAIN FUNCTION =====================================//
-
 function performAction(actionName) {
     console.log(`performAction called with: ${actionName}`);
     const actionFunction = actionHandlers[actionName];

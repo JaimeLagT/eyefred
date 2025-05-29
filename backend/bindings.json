@@ -1,10 +1,10 @@
 {
-  "openPalm": "Play / Pause",
-  "peace": "",
-  "rock": "",
+  "openPalm": "Mission Control",
+  "peace": "Open Google",
+  "rock": "Go to Netflix",
   "fist": "",
-  "thumbsLeft": "",
-  "thumbsRight": "",
+  "thumbsLeft": "Volume Down",
+  "thumbsRight": "Volume Up",
   "palmLeft": "",
   "palmRight": ""
 }

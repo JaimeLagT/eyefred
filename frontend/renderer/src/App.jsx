@@ -56,7 +56,7 @@ async function handlePacket(event) {
 //========================== MAIN FUNCTION ==========================//
 function App() {
     const [bindings, setBindings] = useState({});
-    const [isDark, setIsDark] = useState(false);
+    const [isDark, setIsDark] = useState({});
 
     // WebSocket setup
     useEffect(() => {
@@ -85,7 +85,7 @@ function App() {
         })();
     }, []);
 
-
+    // Load user Prefernce on mount
     useEffect(() => {
         (async () => {
             try {
