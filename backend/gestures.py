@@ -221,20 +221,29 @@ def resetCounters():
 def detectGesture(landmarks: Any) -> Optional[str]:
     global lastFiredGesture
     for label, test_fn, bounce in STATIC_GESTURES:
+        #1 check if we have landmarks
         if not test_fn(landmarks):
             continue
-         
+
+        #2 pass label through a persistancy check 
         if not checkPersistence(label):
             return None
-        #bounce is for gestures that we want to keep firing as long as we keep them in the camera
-        if not bounce:
-            return label
-        #if we keep a bounce gesture in the camera dont fire it since the user hasnt put their hand back
-        if lastFiredGesture == label:
-            return None
         
-        lastFiredGesture = label
-        return label
+        #3 if we want to bounce this gesture check if it is the same as the LFG
+        if bounce:
+            if lastFiredGesture != label:
+                #4 if not update LFG and fire
+                lastFiredGesture = label
+                return label
+            else:
+                if(not lastFiredGesture):
+                    print("lfg reset")
+                else:
+                    print(lastFiredGesture)
+                return None
+        #5 if we don't want to bounce them keep firing as long as we keep them in the camera
+        else:
+            return label
 
     # no match this frame → reset all counters
     resetCounters()
