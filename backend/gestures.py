@@ -227,6 +227,7 @@ def detectGesture(landmarks: Any) -> Optional[str]:
 
         #2 pass label through a persistancy check 
         if not checkPersistence(label):
+            lastFiredGesture = None
             return None
         
         #3 if we want to bounce this gesture check if it is the same as the LFG
