@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
@@ -40,15 +40,28 @@ ipcMain.on('set-bindings', async (_event, newBindings) => {
     }
 });
 
-// 4) get Preference: get Dark mode preference
-ipcMain.handle('get-preference', async () => {
-    return store.get("isDark");
+// 4) get Dark Mode
+ipcMain.handle('get-darkMode', async () => {
+    const mode = store.get('darkMode');
+    console.log('get-dark-mode →', mode);
+    return mode;
 });
 
-// 5) set  Prefernce: set Dark mode preference
-ipcMain.on('set-preference', (_event, isDark) => {
-    store.set("isDark", isDark);
+// 5) toggle Dark Mode
+ipcMain.handle('toggle-darkMode', () => {
+    const current = store.get('darkMode');
+    const next = !current;
+    store.set('darkMode', next);
+    console.log('toggle-dark-mode →', next);
+    nativeTheme.themeSource = next ? 'dark' : 'light';
+
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('dark-mode-changed', next);
+    });
+
+    return next;
 });
+
 
 //========================== HELPER FUNCTIONS ==========================//
 
@@ -64,6 +77,11 @@ function handleWindowOpen() {
     if (BrowserWindow.getAllWindows().length === 0) {
         newBrowserWindow();
     }
+}
+
+function applySavedTheme() {
+    const darkMode = store.get('darkMode', false);
+    nativeTheme.themeSource = darkMode ? 'dark' : 'light';
 }
 
 function newBrowserWindow() {
@@ -84,6 +102,8 @@ function newBrowserWindow() {
             additionalArguments: [`--appPath=${__dirname}`],
         }
     });
+
+    applySavedTheme()
 
     // vite app.jsx window loading
     if (isDev) {

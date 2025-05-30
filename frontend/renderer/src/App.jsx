@@ -21,7 +21,9 @@ const actionList = [
     'Previous Track',
     'Go to Netflix',
     'Go to YouTube',
-    'Open Eyefred'
+    'Open Eyefred',
+    'Switch Tab (Left)',
+    'Switch Tab (Right)',
 ];
 
 
@@ -57,7 +59,7 @@ async function handlePacket(event) {
 //========================== MAIN FUNCTION ==========================//
 function App() {
     const [bindings, setBindings] = useState({});
-    const [isDark, setIsDark] = useState({});
+    const [darkMode, setDarkMode] = useState(false);
 
     // WebSocket setup
     useEffect(() => {
@@ -86,31 +88,26 @@ function App() {
         })();
     }, []);
 
-    // Load user Prefernce on mount
+    // Load user dark mode on mount
     useEffect(() => {
-        (async () => {
-            try {
-                const stored = await window.eyefred.getDarkPreference();
-                setIsDark(stored);
-            } catch (err) {
-                console.error("Failed to load Dark Mode Preference", err);
-                setIsDark(false);
-            }
-        })();
+        // initialize
+        window.eyefred.getDarkMode().then(setDarkMode);
+        // listen for changes
+        window.eyefred.onDarkModeChanged(setDarkMode);
     }, []);
 
-    // Whenever isDark changes, toggle the body class
+    //Whenever isDark changes, toggle the body class
     useEffect(() => {
-        // don’t run this while still loading
-        if (isDark === null) return;
+        // Apply CSS classes on <body>
+        document.body.classList.toggle('dark-mode', darkMode);
+        document.body.classList.toggle('light-mode', !darkMode);
+    }, [darkMode]);
 
-        // apply the correct class
-        document.body.classList.toggle('dark-mode', isDark);
-        document.body.classList.toggle('light-mode', !isDark);
-
-        // save exactly what we have
-        window.eyefred.setDarkPreference(isDark);
-    }, [isDark]);
+    //handle the dark mode toggle
+    const handleToggle = async () => {
+        const newMode = await window.eyefred.toggleDarkMode();
+        setDarkMode(newMode);
+    };
 
     // Handle dropdown change
     const handleChange = (gesture) => async (e) => {
@@ -147,8 +144,8 @@ function App() {
                 <h1>Eyefred Gesture Mappings</h1>
                 <p>Select an action for each gesture:</p>
                 <Toggle
-                    isChecked={isDark}
-                    handleChange={() => setIsDark(!isDark)}
+                    isChecked={darkMode}
+                    handleChange={handleToggle}
                 ></Toggle>
             </header>
 
@@ -158,7 +155,7 @@ function App() {
                     {Object.keys(bindings).map((gesture) => {
                         // Decide which CSS class to apply for rotating/flipping the emoji
                         const transformClass = flippedHGestures.has(gesture)
-                            ? 'flipped'              // horizontal mirror
+                            ? 'flipped'            // horizontal mirror
                             : flipped90Gestures.has(gesture)
                                 ? 'point-right'      //  90° rotate
                                 : flippedNeg90Gestures.has(gesture)

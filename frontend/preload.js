@@ -17,10 +17,11 @@ contextBridge.exposeInMainWorld('eyefred', {
         ipcRenderer.send('set-bindings', newBindings);
     },
 
-    getDarkPreference: () => {
-        return ipcRenderer.invoke('get-preference')
+    getDarkMode: () => {
+        return ipcRenderer.invoke('get-darkMode')
     },
-    setDarkPreference: (isDark) => {
-        ipcRenderer.send('set-preference', isDark)
-    }
+    toggleDarkMode: (isDark) => {
+        ipcRenderer.invoke('toggle-darkMode', isDark)
+    },
+    onDarkModeChanged: callback => ipcRenderer.on('dark-mode-changed', (_, mode) => callback(mode))
 });
