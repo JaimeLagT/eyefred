@@ -1,6 +1,7 @@
 const { exec } = require('child_process');
 const os = require('os');
-const { keyboard, Key } = require('@nut-tree-fork/nut-js');
+let keyboard
+let Key
 
 // Determine platform
 const platform = os.platform(); // 'win32', 'darwin', 'linux'
@@ -12,13 +13,17 @@ let robot;
 if (isMac) {
     robot = require('robotjs');
 }
+else if (isWin) {
+    const nut = require('@nut-tree-fork/nut-js')
+    keyboard = nut.keyboard
+    Key = nut.Key
+    keyboard.config.autoDelayMs = 50;
+}
 
 /** Error‐logging helper */
 function logError(err) {
     if (err) console.error('Action error:', err);
 }
-
-keyboard.config.autoDelayMs = 50;
 
 //===================================== ACTION FUNCTIONS =====================================//
 
@@ -286,6 +291,48 @@ function showDesktop() {
     }
 }
 
+function switchTabRight() {
+    if (isMac) {
+        robot.keyTap('right', ['command', 'alt']);
+    } else if (isWin) {
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftControl);
+                // Tap Tab
+                await keyboard.pressKey(Key.Tab);
+                await keyboard.releaseKey(Key.Tab);
+                // Release Ctrl
+                await keyboard.releaseKey(Key.LeftControl);
+            } catch (err) {
+                logError(err);
+            }
+        })();
+    }
+
+}
+
+function switchTabLeft() {
+    if (isMac) {
+        robot.keyTap('left', ['command', 'alt']);
+    } else if (isWin) {
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftControl);
+                await keyboard.pressKey(Key.LeftShift);
+                // Tap Tab
+                await keyboard.pressKey(Key.Tab);
+                await keyboard.releaseKey(Key.Tab);
+                // Release Shift + Ctrl (reverse order)
+                await keyboard.releaseKey(Key.LeftShift);
+                await keyboard.releaseKey(Key.LeftControl);
+            } catch (err) {
+                logError(err);
+            }
+        })();
+    }
+
+}
+
 //===================================== LOOK-UP TABLE =====================================//
 const actionHandlers = {
     'Open Spotify': openSpotify,
@@ -307,7 +354,9 @@ const actionHandlers = {
     'Take Screenshot': takeScreenshot,
     'Toggle Microphone Mute': toggleMicrophoneMute,
     'Show Desktop': showDesktop,
-    'Open Eyefred': openEyefed
+    'Open Eyefred': openEyefed,
+    'Switch Tab (Left)': switchTabLeft,
+    'Switch Tab (Right)': switchTabRight,
     // …add more actions here…
 };
 
