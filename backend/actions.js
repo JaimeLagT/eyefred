@@ -258,7 +258,8 @@ function toggleMicrophoneMute() {
     if (isMac) {
         exec([
             "osascript -e 'set cur to input volume of (get volume settings)'",
-            "-e 'if cur > 0 then set volume input volume 0 else set volume input volume 100 end if'"
+            "-e 'if cur > 0 then set volume input volume 0 else set volume input volume 100 end if'",
+            "-e 'beep'"
         ].join(' '), logError);
     } else if (isWin) {
         (async () => {
