@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.6",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "electron-store": "^10.0.1",
     "react": "^19.1.0",

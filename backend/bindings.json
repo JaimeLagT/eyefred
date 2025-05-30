@@ -1,10 +1,10 @@
 {
-  "openPalm": "Go to Netflix",
-  "peace": "",
-  "rock": "",
-  "fist": "",
+  "openPalm": "Play / Pause",
+  "peace": "Open Spotify",
+  "rock": "Go to Netflix",
+  "fist": "Show Desktop",
   "thumbsLeft": "Volume Down",
   "thumbsRight": "Volume Up",
-  "palmLeft": "",
-  "palmRight": ""
+  "palmLeft": "Switch Window (Left)",
+  "palmRight": "Switch Window (Right)"
 }

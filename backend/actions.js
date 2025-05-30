@@ -1,5 +1,6 @@
 const { exec } = require('child_process');
 const os = require('os');
+const { keyboard, Key } = require('@nut-tree-fork/nut-js');
 
 // Determine platform
 const platform = os.platform(); // 'win32', 'darwin', 'linux'
@@ -17,6 +18,8 @@ function logError(err) {
     if (err) console.error('Action error:', err);
 }
 
+keyboard.config.autoDelayMs = 50;
+
 //===================================== ACTION FUNCTIONS =====================================//
 
 function openSpotify() {
@@ -27,11 +30,19 @@ function openSpotify() {
     }
 }
 
+function openEyefed() {
+    if (isMac) {
+        exec('open -a Eyefred', logError);
+    } else if (isWin) {
+        exec('start "" "Eyefred:"', logError);
+    }
+}
+
 function volumeDown() {
     if (isMac) {
         exec([
             "osascript -e 'set cur to output volume of (get volume settings)'",
-            "-e 'set tgt to cur - 20'",
+            "-e 'set tgt to cur - 10'",
             "-e 'if tgt < 0 then set tgt to 0'",
             "-e 'set volume output volume tgt'"
         ].join(' '), logError);
@@ -47,7 +58,7 @@ function volumeUp() {
     if (isMac) {
         exec([
             "osascript -e 'set cur to output volume of (get volume settings)'",
-            "-e 'set tgt to cur + 20'",
+            "-e 'set tgt to cur + 10'",
             "-e 'if tgt > 100 then set tgt to 100'",
             "-e 'set volume output volume tgt'"
         ].join(' '), logError);
@@ -125,24 +136,38 @@ function switchWindowRight() {
             logError
         );
     } else if (isWin) {
-        exec(
-            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys('%{TAB}')"`,
-            logError
-        );
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftAlt);
+                await keyboard.pressKey(Key.Tab);
+                await keyboard.releaseKey(Key.Tab);
+                await keyboard.releaseKey(Key.LeftAlt);
+            } catch (err) {
+                logError(err);
+            }
+        })();
     }
 }
 
 function switchWindowLeft() {
     if (isMac) {
         exec(
-            "osascript -e 'tell application \"System Events\" to key code 123 using control down'",
+            "osascript -e 'tell application \"System Events\" to key code 123 using cont`rol down'",
             logError
         );
     } else if (isWin) {
-        exec(
-            `powershell -Command "(New-Object -ComObject WScript.Shell).SendKeys('%+{TAB}')"`,
-            logError
-        );
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftAlt);
+                await keyboard.pressKey(Key.Tab);
+                await keyboard.pressKey(Key.Left);
+                await keyboard.releaseKey(Key.Tab);
+                await keyboard.releaseKey(Key.LeftAlt);
+                await keyboard.releaseKey(Key.Left);
+            } catch (err) {
+                logError(err);
+            }
+        })();
     }
 }
 
@@ -221,6 +246,7 @@ function takeScreenshot() {
             logError
         );
     }
+
 }
 
 function toggleMicrophoneMute() {
@@ -230,7 +256,16 @@ function toggleMicrophoneMute() {
             "-e 'if cur > 0 then set volume input volume 0 else set volume input volume 100 end if'"
         ].join(' '), logError);
     } else if (isWin) {
-        console.warn('Toggle Microphone Mute not implemented on Windows');
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftAlt);
+                await keyboard.pressKey(Key.A);
+                await keyboard.releaseKey(Key.A);
+                await keyboard.releaseKey(Key.LeftAlt);
+            } catch (err) {
+                logError(err);
+            }
+        })();
     }
 }
 
@@ -240,10 +275,14 @@ function showDesktop() {
             "osascript -e 'tell application \"System Events\" to key code 103 using {control down, option down}'"
         ].join(' '), logError);
     } else if (isWin) {
-        exec(
-            `powershell -Command "(New-Object -ComObject Shell.Application).MinimizeAll()"`,
-            logError
-        );
+        (async () => {
+            try {
+                await keyboard.pressKey(Key.LeftSuper, Key.D);
+                await keyboard.releaseKey(Key.LeftSuper, Key.D);
+            } catch (err) {
+                logError(err);
+            }
+        })();
     }
 }
 
@@ -268,6 +307,7 @@ const actionHandlers = {
     'Take Screenshot': takeScreenshot,
     'Toggle Microphone Mute': toggleMicrophoneMute,
     'Show Desktop': showDesktop,
+    'Open Eyefred': openEyefed
     // …add more actions here…
 };
 

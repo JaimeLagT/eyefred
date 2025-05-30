@@ -6,8 +6,8 @@ import { Toggle } from './components/Toggle';
 const actionList = [
     "Play / Pause",
     "Open Spotify",
-    "Switch Window (Right)",
     "Switch Window (Left)",
+    "Switch Window (Right)",
     "Open Google",
     "Mission Control",
     "Volume Up",
@@ -20,7 +20,8 @@ const actionList = [
     'Next Track',
     'Previous Track',
     'Go to Netflix',
-    'Go to YouTube'
+    'Go to YouTube',
+    'Open Eyefred'
 ];
 
 

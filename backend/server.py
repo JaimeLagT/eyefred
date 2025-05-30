@@ -57,7 +57,7 @@ async def gesture_server(websocket, path):
                     lastFiredGesture = "Empty"
                     continue
                 #4 if we processed a gesture wrap it into a json string and send it over a websocket packet
-                if gesture_name:
+                if gesture_name and lastFiredGesture != "Empty":
                     payload = json.dumps({"gesture": gesture_name})
                     await websocket.send(payload)
                 
