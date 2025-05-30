@@ -83,8 +83,6 @@ def isPalmRight(landmarks: Any) -> bool:
 
 #========================== GLOBAL VARIABLES ==========================#
 
-lastFiredGesture = None
-
 #mediapipe landmark numbers to fingers
 class Finger(Enum):
     Thumb  = (4, 2)
@@ -119,7 +117,7 @@ STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
     ("palmLeft", isPalmLeft, True),
 ]
 
-PERSISTENCE = 20
+PERSISTENCE = 10
 THUMBTHRESHOLD = 0.1
 HORISONTALTHRESHOLD = 0.1
 
@@ -211,15 +209,12 @@ def checkPersistence(label) -> bool:
 
 #reset the persistence counter and LFG
 def resetCounters():
-    global lastFiredGesture
     for gestureName in persistenceCounters:
         persistenceCounters[gestureName] = 0
-    lastFiredGesture = None
 
 #========================== MAIN FUNCTION ==========================#
 
-def detectGesture(landmarks: Any) -> Optional[str]:
-    global lastFiredGesture
+def detectGesture(landmarks: Any, lastFiredGesture) -> Optional[str]:
     for label, test_fn, bounce in STATIC_GESTURES:
         #1 check if we have landmarks
         if not test_fn(landmarks):
@@ -227,22 +222,13 @@ def detectGesture(landmarks: Any) -> Optional[str]:
 
         #2 pass label through a persistancy check 
         if not checkPersistence(label):
-            lastFiredGesture = None
             return None
         
         #3 if we want to bounce this gesture check if it is the same as the LFG
         if bounce:
             if lastFiredGesture != label:
-                #4 if not update LFG and fire
-                lastFiredGesture = label
                 return label
-            else:
-                if(not lastFiredGesture):
-                    print("lfg reset")
-                else:
-                    print(lastFiredGesture)
-                return None
-        #5 if we don't want to bounce them keep firing as long as we keep them in the camera
+        #4 if we don't want to bounce them keep firing as long as we keep them in the camera
         else:
             return label
 

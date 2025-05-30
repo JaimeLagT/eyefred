@@ -16,8 +16,9 @@ from gestures import *
 print("SERVER.PY STARTED")
 
 async def gesture_server(websocket, path):
+    #keep track of last fired gesture so we can bounce it
+    lastFiredGesture = None
     print("Entered gesture_server")
-    
     #open camera
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -46,11 +47,16 @@ async def gesture_server(websocket, path):
 
                 #3 if a hand was detected pass them to detect gesture function 
                 gesture_name = None
+                print(lastFiredGesture)
                 if hasattr(results, "multi_hand_landmarks") and results.multi_hand_landmarks:
                     if (results.multi_handedness[0].classification[0].label == "Right"):
                         continue
-                    gesture_name =  detectGesture(results.multi_hand_landmarks[0])
-
+                    gesture_name =  detectGesture(results.multi_hand_landmarks[0], lastFiredGesture)
+                    if gesture_name != None:
+                        lastFiredGesture = gesture_name
+                else:
+                    lastFiredGesture = "Empty"
+                    continue
                 #4 if we processed a gesture wrap it into a json string and send it over a websocket packet
                 if gesture_name:
                     payload = json.dumps({"gesture": gesture_name})
