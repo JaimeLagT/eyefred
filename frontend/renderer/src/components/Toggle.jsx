@@ -2,7 +2,7 @@ import React from 'react';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import "./Toggle.css";
 
-export const Toggle = ({ handleChange, isChecked }) => {
+export const Toggle = ({ handleChange, isChecked = false }) => {
     return (
         <div className="toggle-container">
             {/* Hidden checkbox for the toggle logic */}
