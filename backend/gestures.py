@@ -117,7 +117,7 @@ STATIC_GESTURES: list[tuple[str, Callable[[Any], bool], bool]] = [
     ("palmLeft", isPalmLeft, True),
 ]
 
-PERSISTENCE = 10
+PERSISTENCE = 20
 THUMBTHRESHOLD = 0.1
 HORISONTALTHRESHOLD = 0.1
 

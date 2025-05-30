@@ -35,6 +35,14 @@ function openSpotify() {
     }
 }
 
+function openWhatsapp() {
+    if (isMac) {
+        exec('open -a Whatsapp', logError);
+    } else if (isWin) {
+        exec('start "" "Whatsapp:"', logError);
+    }
+}
+
 function openEyefed() {
     if (isMac) {
         exec('open -a Eyefred', logError);
@@ -334,6 +342,9 @@ function switchTabLeft() {
 
 }
 
+function None() {
+}
+
 //===================================== LOOK-UP TABLE =====================================//
 const actionHandlers = {
     'Open Spotify': openSpotify,
@@ -358,6 +369,8 @@ const actionHandlers = {
     'Open Eyefred': openEyefed,
     'Switch Tab (Left)': switchTabLeft,
     'Switch Tab (Right)': switchTabRight,
+    'Open Whatsapp': openWhatsapp,
+    'None': None,
     // …add more actions here…
 };
 

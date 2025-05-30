@@ -1,10 +1,10 @@
 {
-  "openPalm": "",
+  "openPalm": "Play / Pause",
   "peace": "",
-  "rock": "",
+  "rock": "None",
   "fist": "",
-  "thumbsLeft": "",
-  "thumbsRight": "",
-  "palmLeft": "",
-  "palmRight": ""
+  "thumbsLeft": "Volume Down",
+  "thumbsRight": "Volume Up",
+  "palmLeft": "Previous Track",
+  "palmRight": "Next Track"
 }
