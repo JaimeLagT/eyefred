@@ -15,7 +15,7 @@ if (isProd) {
     // packaged: launch the server binary itself
     cmd = path.join(
         process.resourcesPath,
-        'backend',
+        'backend', 'dist',
         process.platform === 'win32' ? 'server.exe' : 'server'
     );
 } else {

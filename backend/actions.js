@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const os = require('os');
-let keyboard
-let Key
+let keyboard;
+let Key;
 
 // Determine platform
 const platform = os.platform(); // 'win32', 'darwin', 'linux'
@@ -24,7 +24,7 @@ else if (isWin) {
         Key = nut.Key
         keyboard.config.autoDelayMs = 50;
     } catch (err) {
-        console.error("Failed to load robot.js", err);
+        console.error("Failed to load nut.js", err);
     }
 }
 

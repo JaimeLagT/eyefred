@@ -1,37 +1,8 @@
-try {
-    const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
-    console.log('✓ Electron modules loaded');
-} catch (err) {
-    console.error('✗ Failed to load Electron:', err);
-    throw err;
-}
-
-try {
-    const python = require('./start-python');
-    console.log('✓ start-python loaded');
-} catch (err) {
-    console.error('✗ Failed to load start-python:', err);
-    throw err;
-}
-
-try {
-    const path = require('path');
-    const fs = require('fs');
-    const Store = require("electron-store");
-    console.log('✓ Node modules loaded');
-} catch (err) {
-    console.error('✗ Failed to load Node modules:', err);
-    throw err;
-}
-
-
-
-
 const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
-const Store = require("electron-store"); // <-- Fixed: use require instead of import
+const Store = require("electron-store");
 const store = new Store();
 
 process.on('uncaughtException', (error) => {
@@ -66,7 +37,6 @@ if (isDev) {
 }
 
 const bindingsPath = path.join(backendPath, 'bindings.json');
-const actions = require(path.join(backendPath, 'actions.js'));
 
 // Check if backend files exist
 try {

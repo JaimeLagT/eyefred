@@ -43,6 +43,8 @@ const gestureIcons = {
 const flippedHGestures = new Set(["palmRight", "rock"]);
 const flipped90Gestures = new Set(["thumbsRight"]);
 const flippedNeg90Gestures = new Set(["thumbsLeft"]);
+const maxRetries = 10;
+const initialDelay = 500;
 
 //========================== HELPER FUNCTIONS ==========================//
 async function handlePacket(event) {
@@ -54,9 +56,36 @@ async function handlePacket(event) {
     window.eyefred?.performAction?.(action);
 }
 
-// function updateBindings(newSet) {
+function handleConnection() {
+    return new Promise((resolve, reject) => {
+        let retries = 0;
+        let delay = initialDelay;
+        let socket;
+        function tryConnection() {
+            socket = new WebSocket('ws://localhost:8765');
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+                retries = 0;
+                socket.onmessage = handlePacket;
+                return resolve(socket);
+            }
+            socket.onerror = (err) => {
+                console.warn('Connection failed retrying..', err);
+            };
+            socket.onclose = () => {
+                if (retries < maxRetries) {
+                    retries++
+                    delay = delay * 2;
+                    setTimeout(tryConnection, delay)
+                } else {
+                    return reject(new Error('Max WebSocket retries reached'));
+                }
+            }
+        };
+        tryConnection();
+    });
+}
 
-// }
 
 //========================== MAIN FUNCTION ==========================//
 function App() {
@@ -65,16 +94,9 @@ function App() {
 
     // WebSocket setup
     useEffect(() => {
-        let socket;
-        const delay = setTimeout(() => {
-            socket = new WebSocket('ws://localhost:8765');
-            socket.onmessage = handlePacket;
-        }, 1500);
-
-        return () => {
-            clearTimeout(delay);
-            if (socket) socket.close();
-        };
+        handleConnection().catch((err) => {
+            console.error('WebSocket failed:', err.message);
+        });
     }, []);
 
     // Load bindings on mount
