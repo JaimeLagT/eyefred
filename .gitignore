@@ -17,3 +17,4 @@ server.spec
 
 frontend/tools/tailwindcss
 frontend/tools/tailwindcss.exe
+out/

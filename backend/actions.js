@@ -11,13 +11,21 @@ const isMac = platform === 'darwin';
 // For macOS, load robotjs for media keys
 let robot;
 if (isMac) {
-    robot = require('robotjs');
+    try {
+        robot = require('robotjs');
+    } catch (err) {
+        console.error("Failed to load robot.js", err);
+    }
 }
 else if (isWin) {
-    const nut = require('@nut-tree-fork/nut-js')
-    keyboard = nut.keyboard
-    Key = nut.Key
-    keyboard.config.autoDelayMs = 50;
+    try {
+        const nut = require('@nut-tree-fork/nut-js')
+        keyboard = nut.keyboard
+        Key = nut.Key
+        keyboard.config.autoDelayMs = 50;
+    } catch (err) {
+        console.error("Failed to load robot.js", err);
+    }
 }
 
 /** Error‐logging helper */

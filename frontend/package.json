@@ -1,57 +1,13 @@
 {
-  "name": "eyefred",
+  "name": "eyefred-frontend",
   "version": "1.0.0",
-  "description": "Gesture-driven OS control with Electron and Python backend",
-  "main": "main.js",
+  "private": true,
   "scripts": {
-    "start": "electron .",
-    "build:css": "node_modules/.bin/tailwindcss -i ./src/index.css -o ./dist/output.css --minify",
     "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "cd renderer && npm run dev",
-    "dev:electron": "wait-on http://localhost:5173 && electron .",
-    "build": "npm run build:renderer && electron-builder",
-    "build:renderer": "cd renderer && npm run build"
-  },
-  "keywords": [],
-  "author": "Jaime Lagunas",
-  "license": "ISC",
-  "build": {
-    "appId": "com.eyefred.app",
-    "productName": "Eyefred",
-    "files": [
-    "**/*",
-    "!node_modules/.cache",
-    "!venv",
-    "!venv/**",
-    "!tools",
-    "!tools/**",
-    "!future deployments",
-    "!future deployments/**",
-    "!**/__pycache__",
-    "!**/__pycache__/**",
-    "!*.spec",
-    "!*.log",
-    "!*.md",
-    "!README.md",
-    "!package-lock.json",
-    "!**/.git",
-    "!**/.git/**"
-    ],
-    "extraResources": [
-      {
-        "from": "../backend",
-        "to": "backend"
-      }
-    ],
-    "directories": {
-      "buildResources": "../assets"
-    },
-    "mac": {
-      "icon": "../assets/eyefredIcon.icns"
-    },
-    "win": {
-      "icon": "../assets/eyefredIcon.ico"
-    }
+    "dev:electron": "wait-on http://localhost:5173 && electron ..",
+    "build:renderer": "cd renderer && npm run build",
+    "build:css": "node_modules/.bin/tailwindcss -i ./src/index.css -o ./dist/output.css --minify"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
@@ -60,8 +16,6 @@
     "@vitejs/plugin-react": "^4.5.0",
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
-    "electron": "^36.3.1",
-    "electron-builder": "^26.0.12",
     "eslint": "^9.27.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.1.0",
@@ -78,6 +32,7 @@
     "@mui/material": "^7.1.0",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "bootstrap": "^5.3.6",
+    "electron-store": "^10.0.1",
     "lucide-react": "^0.511.0",
     "react-bootstrap": "^2.10.10",
     "react-icons": "^5.5.0"

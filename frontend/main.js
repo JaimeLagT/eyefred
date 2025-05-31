@@ -1,16 +1,111 @@
+try {
+    const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
+    console.log('✓ Electron modules loaded');
+} catch (err) {
+    console.error('✗ Failed to load Electron:', err);
+    throw err;
+}
+
+try {
+    const python = require('./start-python');
+    console.log('✓ start-python loaded');
+} catch (err) {
+    console.error('✗ Failed to load start-python:', err);
+    throw err;
+}
+
+try {
+    const path = require('path');
+    const fs = require('fs');
+    const Store = require("electron-store");
+    console.log('✓ Node modules loaded');
+} catch (err) {
+    console.error('✗ Failed to load Node modules:', err);
+    throw err;
+}
+
+
+
+
 const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
-const Store = require("electron-store").default;
+const Store = require("electron-store"); // <-- Fixed: use require instead of import
 const store = new Store();
 
-const appPath = __dirname;
+process.on('uncaughtException', (error) => {
+    console.error('=== UNCAUGHT EXCEPTION ===');
+    console.error('Error:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('========================');
+});
 
-const bindingsPath = path.join(appPath, '..', 'backend', 'bindings.json');
-const actions = require(path.join(appPath, '..', 'backend', 'actions.js'));
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('=== UNHANDLED REJECTION ===');
+    console.error('Promise:', promise);
+    console.error('Reason:', reason);
+    console.error('==========================');
+});
+
+console.log('Starting main process...');
+console.log('Node version:', process.version);
+console.log('Electron version:', process.versions.electron);
+console.log('Is packaged:', !require('electron').app.isPackaged);
 
 
+//========================== PATH RESOLUTION  ==========================//
+
+const isDev = !app.isPackaged;
+let backendPath;
+
+if (isDev) {
+    backendPath = path.join(__dirname, '..', 'backend');
+} else {
+    backendPath = path.join(process.resourcesPath, 'backend');
+}
+
+const bindingsPath = path.join(backendPath, 'bindings.json');
+const actions = require(path.join(backendPath, 'actions.js'));
+
+// Check if backend files exist
+try {
+    if (fs.existsSync(bindingsPath)) {
+        console.log('✓ bindings.json exists');
+    } else {
+        console.error('✗ bindings.json NOT found at:', bindingsPath);
+    }
+} catch (err) {
+    console.error('Error checking bindings.json:', err);
+}
+
+const actionsPath = path.join(backendPath, 'actions.js');
+console.log('actionsPath:', actionsPath);
+
+try {
+    if (fs.existsSync(actionsPath)) {
+        console.log('✓ actions.js exists');
+    } else {
+        console.error('✗ actions.js NOT found at:', actionsPath);
+    }
+} catch (err) {
+    console.error('Error checking actions.js:', err);
+}
+// Try to load actions with detailed error handling
+let actions;
+try {
+    console.log('Loading actions from:', actionsPath);
+    actions = require(actionsPath);
+    console.log('✓ actions.js loaded successfully');
+} catch (err) {
+    console.error('✗ Failed to load actions.js:', err);
+    console.error('Error details:', {
+        message: err.message,
+        code: err.code,
+        stack: err.stack
+    });
+    throw err;
+}
 //========================== IPC FUNCTIONS ==========================//
 
 
@@ -86,8 +181,6 @@ function applySavedTheme() {
 
 function newBrowserWindow() {
     // isDev should reflect whether we're running from source (false when packaged)
-    const isDev = !app.isPackaged;
-
     const win = new BrowserWindow({
         width: 500,
         height: 650,
