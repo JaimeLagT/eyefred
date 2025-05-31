@@ -9,28 +9,43 @@
     "dev": "concurrently -k -r \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "cd renderer && npm run dev",
     "dev:electron": "wait-on http://localhost:5173 && electron .",
-    "build": "electron-builder"
+    "build": "npm run build:renderer && electron-builder",
+    "build:renderer": "cd renderer && npm run build"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jaime Lagunas",
   "license": "ISC",
   "build": {
     "appId": "com.eyefred.app",
     "productName": "Eyefred",
     "files": [
-      "**/*",
-      "!node_modules/.cache",
-      "!renderer/node_modules/.cache"
+    "**/*",
+    "!node_modules/.cache",
+    "!venv",
+    "!venv/**",
+    "!tools",
+    "!tools/**",
+    "!future deployments",
+    "!future deployments/**",
+    "!**/__pycache__",
+    "!**/__pycache__/**",
+    "!*.spec",
+    "!*.log",
+    "!*.md",
+    "!README.md",
+    "!package-lock.json",
+    "!**/.git",
+    "!**/.git/**"
     ],
-    "directories": {
-      "buildResources": "../assets"
-    },
     "extraResources": [
       {
         "from": "../backend",
         "to": "backend"
       }
     ],
+    "directories": {
+      "buildResources": "../assets"
+    },
     "mac": {
       "icon": "../assets/eyefredIcon.icns"
     },

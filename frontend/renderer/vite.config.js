@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+
 export default defineConfig({
-  base: './',  // <<< add this
+  base: './',
   plugins: [react()],
+  build: {
+    outDir: 'dist'  // relative to renderer folder
+  }
 });

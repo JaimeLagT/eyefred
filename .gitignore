@@ -10,6 +10,7 @@ build/
 
 # ignore build/artifacts
 /release/
+server.spec
 
 # macOS
 .DS_Store
