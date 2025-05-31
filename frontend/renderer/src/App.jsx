@@ -78,6 +78,7 @@ function handleConnection() {
                     delay = delay * 2;
                     setTimeout(tryConnection, delay)
                 } else {
+                    console.warn('Max tries attempted');
                     return reject(new Error('Max WebSocket retries reached'));
                 }
             }

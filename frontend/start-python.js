@@ -24,6 +24,8 @@ if (isProd) {
     args = [path.join(__dirname, '..', 'backend', 'server.py')];
 }
 
+console.log('Launching backend:', cmd);
+
 function start() {
     if (pythonProcess) return pythonProcess;
 

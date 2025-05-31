@@ -60,7 +60,8 @@
     ],
     "asarUnpack": [
       "node_modules/@nut-tree-fork/**/*",
-      "node_modules/robotjs/**/*"
+      "node_modules/robotjs/**/*",
+      "backend/dist/**"
     ],
     "mac": {
       "icon": "assets/eyefredIcon.icns",
