@@ -29,7 +29,7 @@ async def gesture_server(websocket, path):
     with Hands(
         max_num_hands=1,
         model_complexity=1,
-        min_detection_confidence=0.5
+        min_detection_confidence=0.7
     ) as hand_tracker:
 
         print("Client connected:", path)
