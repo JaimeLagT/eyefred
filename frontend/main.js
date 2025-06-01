@@ -152,6 +152,7 @@ function applySavedTheme() {
 function newBrowserWindow() {
     // isDev should reflect whether we're running from source (false when packaged)
     const win = new BrowserWindow({
+        title: 'Eyefred',
         width: 500,
         height: 650,
         titleBarStyle: 'hiddenInset',

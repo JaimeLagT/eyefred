@@ -1,7 +1,8 @@
 {
   "name": "eyefred",
   "version": "1.0.0",
-  "description": "Gesture-driven OS control with Electron and Python backend",
+  "productName": "Eyefred",
+  "description": "Eyefred",
   "main": "frontend/main.js",
   "type": "commonjs",
   "scripts": {
@@ -111,7 +112,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
-    "robotjs": "^0.6.0"
+    "robotjs": "^0.6.0",
+    "tree-kill": "^1.2.2"
   },
   "overrides": {
     "electron-store": "8.1.0"
