@@ -2,8 +2,9 @@ const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
-const Store = require("electron-store");
+const Store = require("electron-store").default;
 const store = new Store();
+const { exec } = require('child_process');
 
 process.on('uncaughtException', (error) => {
     console.error('=== UNCAUGHT EXCEPTION ===');
@@ -130,6 +131,42 @@ ipcMain.handle('toggle-darkMode', () => {
 
 //========================== HELPER FUNCTIONS ==========================//
 
+function closePortWindows(port = 8765) {
+    const findPidCmd = `netstat -ano | findstr :${port}`;
+    exec(findPidCmd, (error, stdout, stderr) => {
+        if (error || stderr || !stdout) {
+            console.error(`Could not find process using port ${port}.`);
+            return;
+        }
+
+        const lines = stdout.trim().split('\n');
+        const pids = new Set();
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/);
+            const pid = parts[parts.length - 1];
+            if (!isNaN(pid)) {
+                pids.add(pid);
+            }
+        }
+
+        for (const pid of pids) {
+            exec(`taskkill /PID ${pid} /F`, (killErr, _killStdout, _killStderr) => {
+                if (killErr) {
+                    console.error(`Error killing PID ${pid}: ${killErr.message}`);
+                } else {
+                    console.log(`Killed PID ${pid} using port ${port}`);
+                }
+            });
+        }
+    });
+}
+
+(async () => {
+    const psList = (await import('ps-list')).default;
+    const processes = await psList();
+    console.log(processes);
+})();
+
 function handleWindowClose() {
     // On non-macOS, quit when all windows are closed
     if (process.platform !== 'darwin') {
@@ -147,6 +184,16 @@ function handleWindowOpen() {
 function applySavedTheme() {
     const darkMode = store.get('darkMode', false);
     nativeTheme.themeSource = darkMode ? 'dark' : 'light';
+}
+
+async function killOrphanServers() {
+    const psList = (await import('ps-list')).default;
+    const list = await psList();
+    const orphans = list.filter(p => p.name.toLowerCase() === 'server.exe');
+    for (const proc of orphans) {
+        console.warn(`Killing orphan server.exe with PID ${proc.pid}`);
+        exec(`taskkill /PID ${proc.pid} /F`);
+    }
 }
 
 function newBrowserWindow() {
@@ -180,8 +227,18 @@ function newBrowserWindow() {
 
 //========================== MAIN FUNCTION ==========================//
 // Kill Python backend before the app quits
-app.on('before-quit', () => {
-    python.stop();
+app.on('will-quit', async (event) => {
+    //let shutdown wait until Python is stopped
+    event.preventDefault();
+    try {
+        await python.stop();
+        closePortWindows();
+    } catch (err) {
+        console.error('Failed to stop Python', err)
+    }
+    console.log(process._getActiveHandles());
+    killOrphanServers();
+    app.exit(0);
 });
 
 // macOS: quit or recreate windows appropriately
