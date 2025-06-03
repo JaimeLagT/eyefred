@@ -1,19 +1,28 @@
+import sys
+from unittest.mock import MagicMock
+
+sys.modules['matplotlib'] = MagicMock()
+sys.modules['matplotlib.pyplot'] = MagicMock()
+sys.modules['matplotlib.font_manager'] = MagicMock()
+
 import cv2
-import mediapipe as mp
 import asyncio
 import json
 from typing import Any
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
 from mediapipe.python.solutions.hands import Hands
-from mediapipe.python.solutions.drawing_utils import draw_landmarks
 from gestures import *
+import os
+
+os.environ['MPLBACKEND'] = 'Agg'
 
 
 ##we want to run at 30-fps
 
 #open camera on default cam
 print("SERVER.PY STARTED")
+
 
 async def gesture_server(websocket, path):
     #keep track of last fired gesture so we can bounce it

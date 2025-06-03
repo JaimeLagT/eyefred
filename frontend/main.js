@@ -2,8 +2,12 @@ const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
-const Store = require("electron-store");
+const Store = require("electron-store").default;
 const store = new Store();
+const { exec } = require('child_process');
+
+
+//========================== DEBUG STATEMENTS  ==========================//
 
 process.on('uncaughtException', (error) => {
     console.error('=== UNCAUGHT EXCEPTION ===');
@@ -130,6 +134,20 @@ ipcMain.handle('toggle-darkMode', () => {
 
 //========================== HELPER FUNCTIONS ==========================//
 
+function closePort() {
+    exec('lsof -ti :8765 | xargs kill -9', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error killing processes on port 8765: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`Processes on port 8765 killed successfully:\n${stdout}`);
+    });
+}
+
 function handleWindowClose() {
     // On non-macOS, quit when all windows are closed
     if (process.platform !== 'darwin') {
@@ -182,6 +200,7 @@ function newBrowserWindow() {
 // Kill Python backend before the app quits
 app.on('before-quit', () => {
     python.stop();
+    closePort();
 });
 
 // macOS: quit or recreate windows appropriately
