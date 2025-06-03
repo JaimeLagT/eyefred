@@ -70,18 +70,29 @@ function start() {
 
 //TODO: TRY THIS TMR:
 function stop() {
-    console.log('Stop Function Called');
-    if (pythonProcess) {
-        console.log('Stopping Python process...');
+    return new Promise((res, rej) => {
+        if (!pythonProcess) return res() // nothing to kill
+        const pid = pythonProcess.pid;
+        console.log(`Attempting to kill server with PID ${pythonProcess.pid}`);
+
+        //wait until the child is really closed
+        const finished = () => {
+            pythonProcess = null;
+            console.log(`✓ Python ${pid} stopped`);
+            res();
+        };
+        //once the python process is closed
+        pythonProcess.once('close', finished);
+        //kill the tree
         treeKill(pythonProcess.pid, 'SIGTERM', (err) => {
             if (err) {
                 console.error('Failed to kill process tree:', err);
+                rej(err);
             } else {
                 console.log('Successfully killed process tree.');
             }
         });
-        pythonProcess = null;
-    }
+    })
 }
 
 module.exports = {

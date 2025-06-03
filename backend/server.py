@@ -8,6 +8,9 @@ from websockets.exceptions import ConnectionClosed
 from mediapipe.python.solutions.hands import Hands
 from mediapipe.python.solutions.drawing_utils import draw_landmarks
 from gestures import *
+import atexit
+import psutil
+import os
 
 
 ##we want to run at 30-fps
@@ -83,3 +86,15 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+@atexit.register
+def cleanup():
+    print("Cleaning up child processes...")
+    current_process = psutil.Process(os.getpid())
+    for child in current_process.children(recursive=True):
+        print(f"Killing child process {child.pid}")
+        try:
+            child.kill()
+        except Exception as e:
+            print(f"Error killing child: {e}")

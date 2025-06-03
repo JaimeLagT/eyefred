@@ -2,8 +2,9 @@ const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const python = require('./start-python');
 const path = require('path');
 const fs = require('fs');
-const Store = require("electron-store");
+const Store = require("electron-store").default;
 const store = new Store();
+const { exec } = require('child_process');
 
 process.on('uncaughtException', (error) => {
     console.error('=== UNCAUGHT EXCEPTION ===');
@@ -130,6 +131,12 @@ ipcMain.handle('toggle-darkMode', () => {
 
 //========================== HELPER FUNCTIONS ==========================//
 
+(async () => {
+    const psList = (await import('ps-list')).default;
+    const processes = await psList();
+    console.log(processes);
+})();
+
 function handleWindowClose() {
     // On non-macOS, quit when all windows are closed
     if (process.platform !== 'darwin') {
@@ -147,6 +154,16 @@ function handleWindowOpen() {
 function applySavedTheme() {
     const darkMode = store.get('darkMode', false);
     nativeTheme.themeSource = darkMode ? 'dark' : 'light';
+}
+
+async function killOrphanServers() {
+    const psList = (await import('ps-list')).default;
+    const list = await psList();
+    const orphans = list.filter(p => p.name.toLowerCase() === 'server.exe');
+    for (const proc of orphans) {
+        console.warn(`Killing orphan server.exe with PID ${proc.pid}`);
+        exec(`taskkill /PID ${proc.pid} /F`);
+    }
 }
 
 function newBrowserWindow() {
@@ -180,8 +197,17 @@ function newBrowserWindow() {
 
 //========================== MAIN FUNCTION ==========================//
 // Kill Python backend before the app quits
-app.on('before-quit', () => {
-    python.stop();
+app.on('will-quit', async (event) => {
+    //let shutdown wait until Python is stopped
+    event.preventDefault();
+    try {
+        await python.stop()
+    } catch (err) {
+        console.error('Failed to stop Python', err)
+    }
+    console.log(process._getActiveHandles());
+    killOrphanServers();
+    app.exit(0);
 });
 
 // macOS: quit or recreate windows appropriately
