@@ -150,7 +150,7 @@ function closePortWindows(port = 8765) {
         }
 
         for (const pid of pids) {
-            exec(`taskkill /PID ${pid} /F`, (killErr, _killStdout, _killStderr) => {
+            exec(`taskkill /PID ${pid} /F`, (killErr) => {
                 if (killErr) {
                     console.error(`Error killing PID ${pid}: ${killErr.message}`);
                 } else {
