@@ -10,7 +10,6 @@ const actionList = [
     "Mission Control",
     "Previous Track",
     "Next Track",
-    "None",
     "Open Eyefred",
     "Open Google",
     "Open Spotify",
@@ -26,6 +25,7 @@ const actionList = [
     "Toggle Microphone Mute",
     "Volume Down",
     "Volume Up",
+    "None",
 ];
 
 
